@@ -31,14 +31,12 @@ pip install --no-build-isolation 'git+https://github.com/facebookresearch/detect
 read -p "\nPress Enter to continue to Detic install" enter
 cd $ZOO_ROOT
 git submodule update --init --recursive src/third_party/Detic
-cd $ZOO_ROOT/src/third_party/Detic
-mkdir models
-wget --no-check-certificate https://dl.fbaipublicfiles.com/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth -O models/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth
+mkdir $ZOO_ROOT/src/third_party/Detic/models
+wget --no-check-certificate https://dl.fbaipublicfiles.com/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth -O $ZOO_ROOT/src/third_party/Detic/models/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth
 
 # MiDaS
 read -p "\nPress Enter to continue to MiDaS install" enter
-cd $ZOO_ROOT/src/third_party/MiDaS/weights
-wget https://github.com/isl-org/MiDaS/releases/download/v3_1/dpt_beit_large_512.pt
+wget --no-check-certificate https://github.com/isl-org/MiDaS/releases/download/v3_1/dpt_beit_large_512.pt -O $ZOO_ROOT/src/third_party/MiDaS/weights/dpt_beit_large_512.pt
 
 # Grounded SAM 
 read -p "Press Enter to continue to Grounded SAM install" enter
