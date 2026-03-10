@@ -8,9 +8,9 @@ import habitat_extensions  # noqa
 from config_utils import get_config
 from habitat.core.env import Env
 
-from home_robot.agent.imagenav_agent.imagenav_agent import ImageNavAgent
-from home_robot.agent.imagenav_agent.visualizer import record_video
-from home_robot_sim.env.habitat_imagenav_env.habitat_imagenav_env import (
+from objectnav_zoo.agent.imagenav_agent.imagenav_agent import ImageNavAgent
+from objectnav_zoo.agent.imagenav_agent.visualizer import record_video
+from objectnav_zoo.env.habitat_imagenav_env.habitat_imagenav_env import (
     HabitatImageNavEnv,
 )
 
