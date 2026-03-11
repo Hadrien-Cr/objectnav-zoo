@@ -7,8 +7,9 @@
 import time
 
 import torch.nn as nn
-from home_robot.mapping.geometric.geometric_map_module import GeometricMapModule
-from home_robot.navigation_policy.exploration.frontier_exploration_policy import (
+
+from objectnav_zoo.mapping.geometric.geometric_map_module import GeometricMapModule
+from objectnav_zoo.navigation_policy.exploration.frontier_exploration_policy import (
     FrontierExplorationPolicy,
 )
 

@@ -7,9 +7,10 @@ from typing import Any, Dict, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
-from home_robot.core.abstract_env import Env
-from home_robot.core.interfaces import Action, Observations
-from home_robot.motion.space import ConfigurationSpace
+
+from objectnav_zoo.core.abstract_env import Env
+from objectnav_zoo.core.interfaces import Action, Observations
+from objectnav_zoo.motion.space import ConfigurationSpace
 
 
 class SimpleEnv(Env):

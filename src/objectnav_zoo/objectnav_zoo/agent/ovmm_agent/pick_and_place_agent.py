@@ -8,12 +8,13 @@ from enum import Enum
 from typing import Any, Dict, List, Tuple
 
 import torch
-from home_robot.agent.objectnav_agent import ObjectNavAgent
-from home_robot.agent.ovmm_agent.ovmm_agent import OpenVocabManipAgent, SemanticVocab
-from home_robot.core.abstract_agent import Agent
-from home_robot.core.interfaces import Action, DiscreteNavigationAction, Observations
-from home_robot.manipulation import HeuristicPlacePolicy
-from home_robot.perception.wrapper import (
+
+from objectnav_zoo.agent.objectnav_agent import ObjectNavAgent
+from objectnav_zoo.agent.ovmm_agent.ovmm_agent import OpenVocabManipAgent, SemanticVocab
+from objectnav_zoo.core.abstract_agent import Agent
+from objectnav_zoo.core.interfaces import Action, DiscreteNavigationAction, Observations
+from objectnav_zoo.manipulation import HeuristicPlacePolicy
+from objectnav_zoo.perception.wrapper import (
     OvmmPerception,
     build_vocab_from_category_map,
     read_category_map_file,
@@ -98,7 +99,7 @@ class PickAndPlaceAgent(OpenVocabManipAgent):
             continuous_angle_tolerance=continuous_angle_tolerance,
         )
         if not self.skip_gaze and hasattr(self.config.AGENT.SKILLS, "GAZE"):
-            from home_robot.agent.ovmm_agent.ppo_agent import PPOAgent
+            from objectnav_zoo.agent.ovmm_agent.ppo_agent import PPOAgent
 
             self.gaze_agent = PPOAgent(
                 config,

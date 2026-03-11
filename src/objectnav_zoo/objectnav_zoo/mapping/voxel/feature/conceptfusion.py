@@ -13,11 +13,6 @@ import matplotlib
 import numpy as np
 import seaborn as sns
 import torch
-from home_robot.mapping.instance import Instance, InstanceView
-from home_robot.perception.encoders import BaseImageTextEncoder
-from home_robot.utils.bboxes_3d import box3d_volume_from_bounds
-from home_robot.utils.point_cloud_torch import unproject_masked_depth_to_xyz_coordinates
-from home_robot.utils.voxel import VoxelizedPointcloud
 from omegaconf import DictConfig
 from PIL import Image
 from segment_anything import SamAutomaticMaskGenerator, SamPredictor, sam_model_registry
@@ -25,6 +20,14 @@ from sklearn.cluster import DBSCAN
 from torch import Tensor
 from torchvision import transforms
 from tqdm import trange
+
+from objectnav_zoo.mapping.instance import Instance, InstanceView
+from objectnav_zoo.perception.encoders import BaseImageTextEncoder
+from objectnav_zoo.utils.bboxes_3d import box3d_volume_from_bounds
+from objectnav_zoo.utils.point_cloud_torch import (
+    unproject_masked_depth_to_xyz_coordinates,
+)
+from objectnav_zoo.utils.voxel import VoxelizedPointcloud
 
 COLOR_LIST = [
     [0.0, 0.0, 1.0],
@@ -492,11 +495,12 @@ class ConceptFusion:
             return self.get_instances_for_queries(queries)
 
     def show_point_cloud_query_pytorch3d(self, query, **plot_scene_kwargs):
-        from home_robot.utils.bboxes_3d import BBoxes3D
-        from home_robot.utils.bboxes_3d_plotly import plot_scene_with_bboxes
-        from home_robot.utils.data_tools.dict import update
         from pytorch3d.structures import Pointclouds
         from pytorch3d.vis.plotly_vis import AxisArgs
+
+        from objectnav_zoo.utils.bboxes_3d import BBoxes3D
+        from objectnav_zoo.utils.bboxes_3d_plotly import plot_scene_with_bboxes
+        from objectnav_zoo.utils.data_tools.dict import update
 
         pc_xyz, pc_feat, _, pc_rgb = self.voxel_map.get_pointcloud()
         inds, similarity = self.query_similarity("chair", pc_feat)
@@ -535,11 +539,12 @@ class ConceptFusion:
         Returns:
             ptc_fig: Plotly visualization of pointcloud
         """
-        from home_robot.utils.bboxes_3d import BBoxes3D
-        from home_robot.utils.bboxes_3d_plotly import plot_scene_with_bboxes
-        from home_robot.utils.data_tools.dict import update
         from pytorch3d.structures import Pointclouds
         from pytorch3d.vis.plotly_vis import AxisArgs
+
+        from objectnav_zoo.utils.bboxes_3d import BBoxes3D
+        from objectnav_zoo.utils.bboxes_3d_plotly import plot_scene_with_bboxes
+        from objectnav_zoo.utils.data_tools.dict import update
 
         traces = {}
 

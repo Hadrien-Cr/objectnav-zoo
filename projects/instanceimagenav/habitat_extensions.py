@@ -10,7 +10,6 @@ import numpy as np
 from habitat.core.embodied_task import Measure
 from habitat.core.registry import registry
 from habitat.core.simulator import AgentState
-from habitat.core.utils import try_cv2_import
 from habitat.tasks.nav.nav import NavigationEpisode
 from habitat.tasks.utils import cartesian_to_polar
 from habitat.utils.geometry_utils import quaternion_rotate_vector
@@ -22,8 +21,7 @@ try:
 except ImportError:
     pass
 
-cv2 = try_cv2_import()
-
+import cv2
 
 MAP_THICKNESS_SCALAR: int = 128
 

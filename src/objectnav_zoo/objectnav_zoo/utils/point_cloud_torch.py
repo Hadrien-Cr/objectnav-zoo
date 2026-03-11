@@ -15,9 +15,10 @@ from typing import List, Optional, Union
 import cv2
 import numpy as np
 import torch
-from home_robot.utils.image import Camera
 from torch import Tensor
 from torch_geometric.nn.pool.voxel_grid import voxel_grid
+
+from objectnav_zoo.utils.image import Camera
 
 
 def depth_to_xyz(depth: torch.Tensor, camera: Camera):

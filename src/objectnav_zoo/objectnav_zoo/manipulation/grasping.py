@@ -7,7 +7,8 @@
 from typing import List, Optional, Tuple
 
 import numpy as np
-from home_robot.motion.stretch import HelloStretchIdx, HelloStretchKinematics
+
+from objectnav_zoo.motion.stretch import HelloStretchIdx, HelloStretchKinematics
 
 
 class SimpleGraspMotionPlanner(object):

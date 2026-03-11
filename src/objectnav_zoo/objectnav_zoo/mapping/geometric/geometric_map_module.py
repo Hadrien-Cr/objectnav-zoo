@@ -13,9 +13,10 @@ import pytorch3d.transforms as pt
 import skimage.morphology
 import torch
 import torch.nn as nn
-from home_robot.mapping.semantic.constants import MapConstants as MC
 from torch import IntTensor, Tensor
 from torch.nn import functional as F
+
+from objectnav_zoo.mapping.semantic.constants import MapConstants as MC
 
 # For debugging input and output maps - shows matplotlib visuals
 debug_maps = False
@@ -290,7 +291,7 @@ class GeometricMapModule(nn.Module):
         )
 
         if self.debug_mode:
-            from home_robot.utils.point_cloud import show_point_cloud
+            from objectnav_zoo.utils.point_cloud import show_point_cloud
 
             rgb = obs[:, :3, :: self.du_scale, :: self.du_scale].permute(0, 2, 3, 1)
             xyz = point_cloud_t[0].reshape(-1, 3)

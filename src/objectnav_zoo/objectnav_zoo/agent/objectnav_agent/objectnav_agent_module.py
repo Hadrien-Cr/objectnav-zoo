@@ -7,11 +7,12 @@
 from typing import Optional
 
 import torch.nn as nn
-from home_robot.mapping.instance import InstanceMemory
-from home_robot.mapping.semantic.categorical_2d_semantic_map_module import (
+
+from objectnav_zoo.mapping.instance import InstanceMemory
+from objectnav_zoo.mapping.semantic.categorical_2d_semantic_map_module import (
     Categorical2DSemanticMapModule,
 )
-from home_robot.navigation_policy.object_navigation.objectnav_frontier_exploration_policy import (
+from objectnav_zoo.navigation_policy.object_navigation.objectnav_frontier_exploration_policy import (
     ObjectNavFrontierExplorationPolicy,
 )
 

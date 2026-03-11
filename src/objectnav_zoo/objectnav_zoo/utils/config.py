@@ -9,11 +9,12 @@ import os
 from pathlib import Path
 from typing import Optional, Tuple
 
-import home_robot
 import hydra
 import yacs.config
 import yaml
 from loguru import logger
+
+import objectnav_zoo
 
 
 class Config(yacs.config.CfgNode):
@@ -32,11 +33,11 @@ def get_config(path: str, opts: Optional[list] = None) -> Tuple[Config, str]:
         opts: command line arguments overriding the config
     """
     try:
-        if os.environ["HOME_ROBOT_ROOT"]:
-            path = os.path.join(os.environ["HOME_ROBOT_ROOT"], path)
+        if os.environ["objectnav_zoo_ROOT"]:
+            path = os.path.join(os.environ["objectnav_zoo_ROOT"], path)
     except KeyError:
         logger.warning(
-            "HOME_ROBOT_ROOT environment variable not set when trying to read configs!"
+            "objectnav_zoo_ROOT environment variable not set when trying to read configs!"
         )
 
     # Start with our code's config
@@ -67,7 +68,7 @@ def get_config(path: str, opts: Optional[list] = None) -> Tuple[Config, str]:
 
 # New configuration system
 CONTROL_CONFIG_DIR = str(
-    Path(home_robot.__path__[0]).parent.resolve() / "config" / "control"
+    Path(objectnav_zoo.__path__[0]).parent.resolve() / "config" / "control"
 )
 
 

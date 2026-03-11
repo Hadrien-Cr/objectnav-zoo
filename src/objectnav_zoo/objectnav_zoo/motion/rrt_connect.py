@@ -10,9 +10,10 @@ from random import random
 from typing import Callable, List
 
 import numpy as np
-from home_robot.motion.base import Planner, PlanResult
-from home_robot.motion.rrt import RRT, TreeNode
-from home_robot.motion.space import ConfigurationSpace, Node
+
+from objectnav_zoo.motion.base import Planner, PlanResult
+from objectnav_zoo.motion.rrt import RRT, TreeNode
+from objectnav_zoo.motion.space import ConfigurationSpace, Node
 
 
 class RRTConnect(RRT):

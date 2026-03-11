@@ -11,10 +11,11 @@ import skfmm
 import skimage
 import skimage.morphology
 import torch
-from home_robot.mapping.voxel import SparseVoxelMap
-from home_robot.motion import XYT, RobotModel
-from home_robot.utils.geometry import angle_difference, interpolate_angles
-from home_robot.utils.morphology import (
+
+from objectnav_zoo.mapping.voxel import SparseVoxelMap
+from objectnav_zoo.motion import XYT, RobotModel
+from objectnav_zoo.utils.geometry import angle_difference, interpolate_angles
+from objectnav_zoo.utils.morphology import (
     binary_dilation,
     binary_erosion,
     expand_mask,

@@ -13,11 +13,12 @@ from typing import Callable, Optional, Union
 
 import torch
 from atomicwrites import atomic_write
-from home_robot.core.interfaces import Observations
-from home_robot.mapping.semantic.instance_tracking_modules import Instance
-from home_robot.mapping.voxel.voxel import SparseVoxelMap
-from home_robot.utils.threading import Interval
 from tqdm import tqdm
+
+from objectnav_zoo.core.interfaces import Observations
+from objectnav_zoo.mapping.semantic.instance_tracking_modules import Instance
+from objectnav_zoo.mapping.voxel.voxel import SparseVoxelMap
+from objectnav_zoo.utils.threading import Interval
 
 logger = logging.getLogger(__name__)
 

@@ -5,9 +5,10 @@
 from typing import Iterable, Tuple
 
 import numpy as np
-import sophus as sp
-from home_robot.core.interfaces import Pose
+import sophuspy as sp
 from scipy.spatial.transform import Rotation
+
+from objectnav_zoo.core.interfaces import Pose
 
 
 def normalize_ang_error(ang):

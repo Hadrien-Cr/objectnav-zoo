@@ -9,15 +9,16 @@ import time
 from typing import List, Tuple
 
 import cv2
-import home_robot.utils.pose as pu
 import matplotlib.pyplot as plt
 import numpy as np
 import skimage.morphology
-from home_robot.core.interfaces import (
+
+import objectnav_zoo.utils.pose as pu
+from objectnav_zoo.core.interfaces import (
     ContinuousNavigationAction,
     DiscreteNavigationAction,
 )
-from home_robot.utils.geometry import xyt_global_to_base
+from objectnav_zoo.utils.geometry import xyt_global_to_base
 
 from .fmm_planner import FMMPlanner
 

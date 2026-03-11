@@ -10,15 +10,16 @@ import cv2
 import home_robot.utils.depth as du
 import numpy as np
 import torch
-from home_robot.core.interfaces import (
+
+from objectnav_zoo.core.interfaces import (
     ContinuousFullBodyAction,
     ContinuousNavigationAction,
     DiscreteNavigationAction,
     Observations,
 )
-from home_robot.manipulation.heuristic_place_policy import HeuristicPlacePolicy
-from home_robot.utils.image import smooth_mask
-from home_robot.utils.rotation import get_angle_to_pos
+from objectnav_zoo.manipulation.heuristic_place_policy import HeuristicPlacePolicy
+from objectnav_zoo.utils.image import smooth_mask
+from objectnav_zoo.utils.rotation import get_angle_to_pos
 
 RETRACTED_ARM_APPROX_LENGTH = 0.15
 STRETCH_STANDOFF_DISTANCE = 0.6

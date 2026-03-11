@@ -14,24 +14,27 @@ import open3d as open3d
 import skimage
 import torch
 import trimesh
-from home_robot.core.interfaces import Observations
-from home_robot.mapping.instance import Instance, InstanceMemory, InstanceView
-from home_robot.motion import PlanResult, RobotModel
-from home_robot.perception.encoders import ClipEncoder
-from home_robot.utils.bboxes_3d import BBoxes3D
-from home_robot.utils.data_tools.dict import update
-from home_robot.utils.morphology import binary_dilation, binary_erosion
-from home_robot.utils.point_cloud import (
+from pytorch3d.structures import Pointclouds
+from torch import Tensor
+
+from objectnav_zoo.core.interfaces import Observations
+from objectnav_zoo.mapping.instance import Instance, InstanceMemory, InstanceView
+from objectnav_zoo.motion import PlanResult, RobotModel
+from objectnav_zoo.perception.encoders import ClipEncoder
+from objectnav_zoo.utils.bboxes_3d import BBoxes3D
+from objectnav_zoo.utils.data_tools.dict import update
+from objectnav_zoo.utils.morphology import binary_dilation, binary_erosion
+from objectnav_zoo.utils.point_cloud import (
     create_visualization_geometries,
     numpy_to_pcd,
     pcd_to_numpy,
     show_point_cloud,
 )
-from home_robot.utils.point_cloud_torch import unproject_masked_depth_to_xyz_coordinates
-from home_robot.utils.visualization import create_disk
-from home_robot.utils.voxel import VoxelizedPointcloud, scatter3d
-from pytorch3d.structures import Pointclouds
-from torch import Tensor
+from objectnav_zoo.utils.point_cloud_torch import (
+    unproject_masked_depth_to_xyz_coordinates,
+)
+from objectnav_zoo.utils.visualization import create_disk
+from objectnav_zoo.utils.voxel import VoxelizedPointcloud, scatter3d
 
 Frame = namedtuple(
     "Frame",
@@ -647,7 +650,7 @@ class SparseVoxelMap(object):
         xyz = ((xyz / self.grid_resolution) + self.grid_origin).long()
         xyz[xyz[:, -1] < 0, -1] = 0
 
-        # from home_robot.utils.point_cloud import show_point_cloud
+        # from objectnav_zoo.utils.point_cloud import show_point_cloud
         # show_point_cloud(xyz, rgb, orig=np.zeros(3))
         xyz[xyz[:, -1] < 0, -1] = 0
         # show_point_cloud(xyz, rgb, orig=np.zeros(3))
@@ -709,10 +712,10 @@ class SparseVoxelMap(object):
             import matplotlib.pyplot as plt
 
             # TODO: uncomment to show the original world representation
-            # from home_robot.utils.point_cloud import show_point_cloud
+            # from objectnav_zoo.utils.point_cloud import show_point_cloud
             # show_point_cloud(xyz, rgb / 255., orig=np.zeros(3))
             # TODO: uncomment to show voxel point cloud
-            # from home_robot.utils.point_cloud import show_point_cloud
+            # from objectnav_zoo.utils.point_cloud import show_point_cloud
             # show_point_cloud(xyz, rgb/255., orig=self.grid_origin)
 
             plt.subplot(2, 2, 1)
@@ -809,8 +812,9 @@ class SparseVoxelMap(object):
     def _show_pytorch3d(
         self, instances: bool = True, mock_plot: bool = False, **plot_scene_kwargs
     ):
-        from home_robot.utils.bboxes_3d_plotly import plot_scene_with_bboxes
         from pytorch3d.vis.plotly_vis import AxisArgs, plot_scene
+
+        from objectnav_zoo.utils.bboxes_3d_plotly import plot_scene_with_bboxes
 
         points, rgb = self.get_xyz_rgb()
 

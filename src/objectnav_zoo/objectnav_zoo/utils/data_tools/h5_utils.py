@@ -10,9 +10,10 @@ import h5py
 import numpy as np
 import rospy
 from geometry_msgs.msg import TransformStamped
-from home_robot.utils.data_tools.image import img_from_bytes
 from matplotlib import pyplot as plt
 from tf2_ros import tf2_ros
+
+from objectnav_zoo.utils.data_tools.image import img_from_bytes
 
 
 def view_keyframe_imgs(file_object: h5py.File, trial_name: str):

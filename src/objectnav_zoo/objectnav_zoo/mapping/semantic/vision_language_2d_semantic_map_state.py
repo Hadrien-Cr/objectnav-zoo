@@ -6,11 +6,12 @@ from typing import List
 
 import numpy as np
 import torch
-from home_robot.agent.mapping.dense.map_utils import (
+
+from objectnav_zoo.agent.mapping.dense.map_utils import (
     MapSizeParameters,
     init_map_and_pose_for_env,
 )
-from home_robot.agent.perception.detection.lseg.modules.models.lseg_net import (
+from objectnav_zoo.agent.perception.detection.lseg.modules.models.lseg_net import (
     LSegEncDecNet,
 )
 

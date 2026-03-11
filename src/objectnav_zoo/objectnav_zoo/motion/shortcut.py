@@ -8,8 +8,9 @@ from random import random
 from typing import Callable, List
 
 import numpy as np
-from home_robot.motion.base import Planner, PlanResult
-from home_robot.motion.rrt import TreeNode
+
+from objectnav_zoo.motion.base import Planner, PlanResult
+from objectnav_zoo.motion.rrt import TreeNode
 
 
 class Shortcut(Planner):

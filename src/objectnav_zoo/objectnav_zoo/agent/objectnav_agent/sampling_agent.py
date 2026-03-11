@@ -8,13 +8,13 @@ from typing import Any, Dict, List, Tuple
 import home_robot.utils.pose as pu
 import numpy as np
 import torch
-
-# from home_robot.core.abstract_agent import Agent
-from home_robot.agent.objectnav_agent import ObjectNavAgent
-from home_robot.core.interfaces import DiscreteNavigationAction, Observations
-from home_robot.mapping.voxel import SparseVoxelMap
-from home_robot.navigation_planner.rrt import RRTPlanner
 from torch.nn import DataParallel
+
+# from objectnav_zoo.core.abstract_agent import Agent
+from objectnav_zoo.agent.objectnav_agent import ObjectNavAgent
+from objectnav_zoo.core.interfaces import DiscreteNavigationAction, Observations
+from objectnav_zoo.mapping.voxel import SparseVoxelMap
+from objectnav_zoo.navigation_planner.rrt import RRTPlanner
 
 from .objectnav_agent_module import ObjectNavAgentModule
 

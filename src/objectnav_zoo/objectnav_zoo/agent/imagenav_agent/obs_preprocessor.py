@@ -7,15 +7,16 @@
 from typing import Optional, Tuple
 
 import cv2
-import home_robot.utils.pose as pu
 import numpy as np
 import skimage.morphology
 import torch
-from home_robot.core.interfaces import Observations
-from home_robot.perception.detection.detic.detic_mask import Detic
 from numpy import ndarray
 from omegaconf import DictConfig
 from torch import Tensor
+
+import objectnav_zoo.utils.pose as pu
+from objectnav_zoo.core.interfaces import Observations
+from objectnav_zoo.perception.detection.detic.detic_mask import Detic
 
 from .superglue import Matching
 

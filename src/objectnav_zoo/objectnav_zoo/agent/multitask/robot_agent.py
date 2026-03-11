@@ -13,24 +13,25 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import torch
 from atomicwrites import atomic_write
-from home_robot.agent.multitask import Parameters
-from home_robot.core.robot import GraspClient, RobotClient
-from home_robot.mapping.instance import Instance
-from home_robot.mapping.voxel import (
+from loguru import logger
+from PIL import Image
+
+from objectnav_zoo.agent.multitask import Parameters
+from objectnav_zoo.core.robot import GraspClient, RobotClient
+from objectnav_zoo.mapping.instance import Instance
+from objectnav_zoo.mapping.voxel import (
     SparseVoxelMap,
     SparseVoxelMapNavigationSpace,
     plan_to_frontier,
 )
-from home_robot.motion import PlanResult, RRTConnect, Shortcut
-from home_robot.perception.encoders import get_encoder
-from home_robot.utils.demo_chat import (
+from objectnav_zoo.motion import PlanResult, RRTConnect, Shortcut
+from objectnav_zoo.perception.encoders import get_encoder
+from objectnav_zoo.utils.demo_chat import (
     DemoChat,
     start_demo_ui_server,
     stop_demo_ui_server,
 )
-from home_robot.utils.threading import Interval
-from loguru import logger
-from PIL import Image
+from objectnav_zoo.utils.threading import Interval
 
 
 def publish_obs(
@@ -246,7 +247,7 @@ class RobotAgent:
         assert self.rpc_stub is not None, "must have RPC stub to connect to remote VLM"
         # This is not a very stable import
         # So we guard it under this part where it's necessary
-        from home_robot.utils.rpc import (
+        from objectnav_zoo.utils.rpc import (
             get_obj_centric_world_representation,
             get_output_from_world_representation,
         )
@@ -258,7 +259,7 @@ class RobotAgent:
         return output
 
     def get_observations(self):
-        from home_robot.utils.rpc import (
+        from objectnav_zoo.utils.rpc import (
             get_obj_centric_world_representation,
             get_output_from_world_representation,
         )
@@ -291,7 +292,7 @@ class RobotAgent:
         assert self.rpc_stub is not None, "must have RPC stub to connect to remote VLM"
         # This is not a very stable import
         # So we guard it under this part where it's necessary
-        from home_robot.utils.rpc import (
+        from objectnav_zoo.utils.rpc import (
             get_obj_centric_world_representation,
             get_output_from_world_representation,
             parse_pick_and_place_plan,

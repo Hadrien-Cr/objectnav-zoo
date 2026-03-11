@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Any, Dict, Tuple
 
-from home_robot.utils.config import get_config
+from objectnav_zoo.utils.config import get_config
 
 
 class Parameters(object):

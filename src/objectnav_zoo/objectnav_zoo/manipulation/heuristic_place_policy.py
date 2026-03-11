@@ -11,14 +11,15 @@ import numpy as np
 import torch
 import torch.nn as nn
 import trimesh.transformations as tra
-from home_robot.core.interfaces import (
+
+from objectnav_zoo.core.interfaces import (
     ContinuousFullBodyAction,
     DiscreteNavigationAction,
     Observations,
 )
-from home_robot.motion.stretch import STRETCH_STANDOFF_DISTANCE
-from home_robot.utils.image import smooth_mask
-from home_robot.utils.rotation import get_angle_to_pos
+from objectnav_zoo.motion.stretch import STRETCH_STANDOFF_DISTANCE
+from objectnav_zoo.utils.image import smooth_mask
+from objectnav_zoo.utils.rotation import get_angle_to_pos
 
 RETRACTED_ARM_APPROX_LENGTH = 0.15
 HARDCODED_ARM_EXTENSION_OFFSET = 0.15
@@ -104,7 +105,7 @@ class HeuristicPlacePolicy(nn.Module):
                 .numpy()
                 .reshape(-1, 3)[target_mask.reshape(-1), :]
             )
-            from home_robot.utils.point_cloud import show_point_cloud
+            from objectnav_zoo.utils.point_cloud import show_point_cloud
 
             rgb = (obs.rgb).reshape(-1, 3) / 255.0
             show_point_cloud(xyz, rgb, orig=np.zeros(3))
@@ -274,7 +275,7 @@ class HeuristicPlacePolicy(nn.Module):
             best_voxel[2] += self.placement_drop_distance
 
             if self.debug_visualize_xyz:
-                from home_robot.utils.point_cloud import show_point_cloud
+                from objectnav_zoo.utils.point_cloud import show_point_cloud
 
                 show_point_cloud(
                     pcd_base_coords.cpu().numpy(),

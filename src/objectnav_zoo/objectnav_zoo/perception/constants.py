@@ -10,7 +10,8 @@ from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
-from home_robot.utils.constants import (
+
+from objectnav_zoo.utils.constants import (
     MAX_DEPTH_REPLACEMENT_VALUE,
     MIN_DEPTH_REPLACEMENT_VALUE,
 )

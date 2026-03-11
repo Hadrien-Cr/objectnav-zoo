@@ -10,17 +10,18 @@ import numpy as np
 import scipy
 import torch
 import torch.nn as nn
-from home_robot.core.abstract_agent import Agent
-from home_robot.core.interfaces import DiscreteNavigationAction, Observations
-from home_robot.mapping.semantic.categorical_2d_semantic_map_module import (
-    Categorical2DSemanticMapModule,
-)
-from home_robot.mapping.semantic.categorical_2d_semantic_map_state import (
-    Categorical2DSemanticMapState,
-)
-from home_robot.navigation_planner.discrete_planner import DiscretePlanner
 from omegaconf import DictConfig
 from sklearn.cluster import DBSCAN
+
+from objectnav_zoo.core.abstract_agent import Agent
+from objectnav_zoo.core.interfaces import DiscreteNavigationAction, Observations
+from objectnav_zoo.mapping.semantic.categorical_2d_semantic_map_module import (
+    Categorical2DSemanticMapModule,
+)
+from objectnav_zoo.mapping.semantic.categorical_2d_semantic_map_state import (
+    Categorical2DSemanticMapState,
+)
+from objectnav_zoo.navigation_planner.discrete_planner import DiscretePlanner
 
 from .frontier_exploration import FrontierExplorationPolicy
 from .obs_preprocessor import ObsPreprocessor

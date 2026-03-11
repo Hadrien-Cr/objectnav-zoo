@@ -15,12 +15,13 @@ from groundingdino.util.inference import Model
 sys.path.insert(
     0, str(Path(__file__).resolve().parent / "Grounded-Segment-Anything/EfficientSAM")
 )
-from home_robot.core.abstract_perception import PerceptionModule  # noqa: E402
-from home_robot.core.interfaces import Observations  # noqa: E402
-from home_robot.perception.detection.utils import filter_depth  # noqa: E402
-from home_robot.perception.detection.utils import overlay_masks
 from MobileSAM.setup_mobile_sam import setup_model  # noqa: E402
 from segment_anything import SamPredictor  # noqa: E402
+
+from objectnav_zoo.core.abstract_perception import PerceptionModule  # noqa: E402
+from objectnav_zoo.core.interfaces import Observations  # noqa: E402
+from objectnav_zoo.perception.detection.utils import filter_depth  # noqa: E402
+from objectnav_zoo.perception.detection.utils import overlay_masks
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

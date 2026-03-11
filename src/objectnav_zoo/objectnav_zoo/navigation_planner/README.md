@@ -3,7 +3,7 @@
 ### Discrete Action Planner Usage
 
 ```
-from home_robot.agent.navigation_planner.discrete_planner import DiscretePlanner
+from objectnav_zoo.agent.navigation_planner.discrete_planner import DiscretePlanner
 
 # See discrete_planner.py for argument info
 discrete_planner = DiscretePlanner(

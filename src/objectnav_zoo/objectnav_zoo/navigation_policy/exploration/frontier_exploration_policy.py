@@ -7,9 +7,10 @@ import scipy
 import skimage.morphology
 import torch
 import torch.nn as nn
-from home_robot.mapping.semantic.constants import MapConstants as MC
-from home_robot.utils.morphology import binary_dilation
 from sklearn.cluster import DBSCAN
+
+from objectnav_zoo.mapping.semantic.constants import MapConstants as MC
+from objectnav_zoo.utils.morphology import binary_dilation
 
 
 class FrontierExplorationPolicy(nn.Module):

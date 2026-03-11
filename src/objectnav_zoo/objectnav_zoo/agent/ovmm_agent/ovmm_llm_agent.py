@@ -14,12 +14,13 @@ import clip
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from home_robot.agent.objectnav_agent.objectnav_agent import ObjectNavAgent
-from home_robot.agent.ovmm_agent.ovmm_agent import OpenVocabManipAgent
-from home_robot.agent.ovmm_agent.ppo_agent import PPOAgent
-from home_robot.core.interfaces import DiscreteNavigationAction, Observations
-from home_robot.manipulation import HeuristicPlacePolicy
 from PIL import Image
+
+from objectnav_zoo.agent.objectnav_agent.objectnav_agent import ObjectNavAgent
+from objectnav_zoo.agent.ovmm_agent.ovmm_agent import OpenVocabManipAgent
+from objectnav_zoo.agent.ovmm_agent.ppo_agent import PPOAgent
+from objectnav_zoo.core.interfaces import DiscreteNavigationAction, Observations
+from objectnav_zoo.manipulation import HeuristicPlacePolicy
 
 
 class Skill(IntEnum):

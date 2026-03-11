@@ -7,7 +7,8 @@
 from pathlib import Path
 
 import click
-from home_robot.mapping import SparseVoxelMap, SparseVoxelMapNavigationSpace
+
+from objectnav_zoo.mapping import SparseVoxelMap, SparseVoxelMapNavigationSpace
 
 
 @click.command()

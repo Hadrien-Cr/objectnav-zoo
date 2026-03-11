@@ -6,9 +6,10 @@ from typing import Optional, Tuple
 
 import numpy as np
 import pybullet as pb
-from home_robot.motion.ik_solver_base import IKSolverBase
-from home_robot.motion.robot import RobotModel
-from home_robot.utils.bullet import PbArticulatedObject, PbClient
+
+from objectnav_zoo.motion.ik_solver_base import IKSolverBase
+from objectnav_zoo.motion.robot import RobotModel
+from objectnav_zoo.utils.bullet import PbArticulatedObject, PbClient
 
 
 class BulletRobotModel(RobotModel):

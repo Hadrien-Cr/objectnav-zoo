@@ -6,8 +6,9 @@
 from typing import Any, Dict, Tuple
 
 import numpy as np
-from home_robot.core.abstract_agent import Agent
-from home_robot.core.interfaces import (
+
+from objectnav_zoo.core.abstract_agent import Agent
+from objectnav_zoo.core.interfaces import (
     ContinuousFullBodyAction,
     DiscreteNavigationAction,
     Observations,

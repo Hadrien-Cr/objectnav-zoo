@@ -13,7 +13,7 @@ import trimesh
 import trimesh.transformations as tra
 
 # Helpers
-from home_robot.utils.image import (
+from objectnav_zoo.utils.image import (
     T_CORRECTION,
     Camera,
     opengl_depth_to_xyz,

@@ -6,9 +6,10 @@ import threading
 from typing import Callable, Optional, Tuple
 
 import numpy as np
-from home_robot.utils.config import get_control_config
-from home_robot.utils.geometry import xyt_global_to_base
 from omegaconf import DictConfig
+
+from objectnav_zoo.utils.config import get_control_config
+from objectnav_zoo.utils.geometry import xyt_global_to_base
 
 DEFAULT_CFG_NAME = "traj_follower"
 

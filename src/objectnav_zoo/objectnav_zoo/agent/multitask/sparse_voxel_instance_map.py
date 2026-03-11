@@ -13,15 +13,16 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from home_robot.core.interfaces import Observations
-from home_robot.datasets.scannet import ScanNetDataset
-from home_robot.mapping.instance import Instance
-from home_robot.mapping.voxel import SparseVoxelMap
-from home_robot.perception import OvmmPerception
-from home_robot.perception.constants import RearrangeDETICCategories
 from hydra_zen import store, zen
 from torch import Tensor
 from tqdm import tqdm
+
+from objectnav_zoo.core.interfaces import Observations
+from objectnav_zoo.datasets.scannet import ScanNetDataset
+from objectnav_zoo.mapping.instance import Instance
+from objectnav_zoo.mapping.voxel import SparseVoxelMap
+from objectnav_zoo.perception import OvmmPerception
+from objectnav_zoo.perception.constants import RearrangeDETICCategories
 
 logger = logging.getLogger(__name__)
 

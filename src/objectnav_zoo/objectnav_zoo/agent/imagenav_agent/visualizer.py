@@ -10,20 +10,24 @@ import shutil
 from typing import Any, Dict, List, Optional
 
 import cv2
-import home_robot.utils.pose as pu
 import numpy as np
 import skimage.morphology
-from habitat.utils.render_wrapper import append_text_to_image
 from habitat.utils.visualizations import maps
-from habitat.utils.visualizations.utils import draw_collision, images_to_video
-from home_robot.perception.constants import PaletteIndices as PI
-from home_robot.perception.constants import languagenav_2categories_map_color_palette
-from home_robot.perception.detection.maskrcnn.coco_categories import (
-    coco_categories_color_palette,
+from habitat.utils.visualizations.utils import (
+    draw_collision,
+    images_to_video,
+    overlay_text_to_image,
 )
-from home_robot.utils.visualization import draw_line, get_contour_points
 from natsort import natsorted
 from PIL import Image
+
+import objectnav_zoo.utils.pose as pu
+from objectnav_zoo.perception.constants import PaletteIndices as PI
+from objectnav_zoo.perception.constants import languagenav_2categories_map_color_palette
+from objectnav_zoo.perception.detection.maskrcnn.coco_categories import (
+    coco_categories_color_palette,
+)
+from objectnav_zoo.utils.visualization import draw_line, get_contour_points
 
 MAP_COLOR_PALETTE = [
     int(x * 255.0)
@@ -616,4 +620,4 @@ class NavVisualizer:
         mask[strip_width:-strip_width] = 0
         mask = mask == 1
         view[mask] = (alpha * np.array([0, 255, 0]) + (1.0 - alpha) * view)[mask]
-        return append_text_to_image(view, ["Goal Detected"], font_size=0.5)
+        return overlay_text_to_image(view, ["Goal Detected"], font_size=0.5)

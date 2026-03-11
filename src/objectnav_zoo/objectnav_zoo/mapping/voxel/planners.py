@@ -4,9 +4,10 @@
 # LICENSE file in the root directory of this source tree.
 import matplotlib.pyplot as plt
 import numpy as np
-from home_robot.mapping.voxel.voxel import SparseVoxelMap
-from home_robot.motion import ConfigurationSpace, Planner, PlanResult
-from home_robot.utils.visualization import get_x_and_y_from_path
+
+from objectnav_zoo.mapping.voxel.voxel import SparseVoxelMap
+from objectnav_zoo.motion import ConfigurationSpace, Planner, PlanResult
+from objectnav_zoo.utils.visualization import get_x_and_y_from_path
 
 
 def plan_to_frontier(

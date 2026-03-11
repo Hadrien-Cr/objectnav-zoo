@@ -6,9 +6,10 @@ from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pinocchio
-from home_robot.motion.bullet import PybulletIKSolver
-from home_robot.motion.ik_solver_base import IKSolverBase
 from scipy.spatial.transform import Rotation as R
+
+from objectnav_zoo.motion.bullet import PybulletIKSolver
+from objectnav_zoo.motion.ik_solver_base import IKSolverBase
 
 # --DEFAULTS--
 # Error tolerances

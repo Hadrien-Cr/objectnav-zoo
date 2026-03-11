@@ -3,8 +3,9 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import numpy as np
-from home_robot.motion.base import Planner
-from home_robot.motion.robot import STRETCH_STANDOFF_WITH_MARGIN, HelloStretchIdx
+
+from objectnav_zoo.motion.base import Planner
+from objectnav_zoo.motion.robot import STRETCH_STANDOFF_WITH_MARGIN, HelloStretchIdx
 
 
 class LinearPlanner(Planner):

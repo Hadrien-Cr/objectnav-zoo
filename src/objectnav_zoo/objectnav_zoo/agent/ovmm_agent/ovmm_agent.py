@@ -8,16 +8,17 @@ from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import torch
-from home_robot.agent.objectnav_agent.objectnav_agent import ObjectNavAgent
-from home_robot.core.interfaces import DiscreteNavigationAction, Observations
-from home_robot.manipulation import HeuristicPickPolicy, HeuristicPlacePolicy
-from home_robot.perception.constants import RearrangeBasicCategories
-from home_robot.perception.wrapper import (
+from trimesh import transformations as tra
+
+from objectnav_zoo.agent.objectnav_agent.objectnav_agent import ObjectNavAgent
+from objectnav_zoo.core.interfaces import DiscreteNavigationAction, Observations
+from objectnav_zoo.manipulation import HeuristicPickPolicy, HeuristicPlacePolicy
+from objectnav_zoo.perception.constants import RearrangeBasicCategories
+from objectnav_zoo.perception.wrapper import (
     OvmmPerception,
     build_vocab_from_category_map,
     read_category_map_file,
 )
-from trimesh import transformations as tra
 
 
 class Skill(IntEnum):
@@ -90,7 +91,7 @@ class OpenVocabManipAgent(ObjectNavAgent):
                 config, self.device, verbose=self.verbose
             )
         elif config.AGENT.SKILLS.PLACE.type == "rl" and not self.skip_skills.place:
-            from home_robot.agent.ovmm_agent.ppo_agent import PPOAgent
+            from objectnav_zoo.agent.ovmm_agent.ppo_agent import PPOAgent
 
             self.place_agent = PPOAgent(
                 config,
@@ -99,7 +100,7 @@ class OpenVocabManipAgent(ObjectNavAgent):
             )
         skip_both_gaze = self.skip_skills.gaze_at_obj and self.skip_skills.gaze_at_rec
         if config.AGENT.SKILLS.GAZE_OBJ.type == "rl" and not skip_both_gaze:
-            from home_robot.agent.ovmm_agent.ppo_agent import PPOAgent
+            from objectnav_zoo.agent.ovmm_agent.ppo_agent import PPOAgent
 
             self.gaze_agent = PPOAgent(
                 config,
@@ -110,7 +111,7 @@ class OpenVocabManipAgent(ObjectNavAgent):
             config.AGENT.SKILLS.NAV_TO_OBJ.type == "rl"
             and not self.skip_skills.nav_to_obj
         ):
-            from home_robot.agent.ovmm_agent.ppo_agent import PPOAgent
+            from objectnav_zoo.agent.ovmm_agent.ppo_agent import PPOAgent
 
             self.nav_to_obj_agent = PPOAgent(
                 config,
@@ -121,7 +122,7 @@ class OpenVocabManipAgent(ObjectNavAgent):
             config.AGENT.SKILLS.NAV_TO_REC.type == "rl"
             and not self.skip_skills.nav_to_rec
         ):
-            from home_robot.agent.ovmm_agent.ppo_agent import PPOAgent
+            from objectnav_zoo.agent.ovmm_agent.ppo_agent import PPOAgent
 
             self.nav_to_rec_agent = PPOAgent(
                 config,

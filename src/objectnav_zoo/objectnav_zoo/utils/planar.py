@@ -1,9 +1,10 @@
 from typing import Optional, Tuple
 
 import torch
-from home_robot.utils.bboxes_3d import box3d_volume_from_bounds
-from home_robot.utils.point_cloud_torch import get_bounds
 from torch import Tensor
+
+from objectnav_zoo.utils.bboxes_3d import box3d_volume_from_bounds
+from objectnav_zoo.utils.point_cloud_torch import get_bounds
 
 
 def transform_basis(points: torch.Tensor, normal_vector: torch.Tensor) -> torch.Tensor:

@@ -3,7 +3,7 @@
 defaults:
   - /habitat: habitat_config_base
   - /habitat/task: instance_imagenav
-  - /habitat/simulator/agents@habitat.simulator.agents.main_agent: rgbd_agent
+  - /habitat/simulator/sensor_setups@habitat.simulator.agents.main_agent: rgbd_agent
   - /habitat/dataset/instance_imagenav: hm3d_v2
   - _self_
 
@@ -24,8 +24,6 @@ habitat:
       allow_sliding: True
     forward_step_size: 0.25
     turn_angle: 30
-    tilt_angle: 30
-    action_space_config: v1
     agents:
       main_agent:
         sim_sensors:

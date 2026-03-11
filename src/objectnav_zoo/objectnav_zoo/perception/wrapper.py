@@ -7,10 +7,11 @@ import json
 import os
 from typing import Any, Dict, Optional, Tuple
 
-from home_robot.core.interfaces import Observations
-from home_robot.perception.constants import RearrangeDETICCategories
-from home_robot.utils.config import load_config
 from loguru import logger
+
+from objectnav_zoo.core.interfaces import Observations
+from objectnav_zoo.perception.constants import RearrangeDETICCategories
+from objectnav_zoo.utils.config import load_config
 
 
 class OvmmPerception:
@@ -38,7 +39,7 @@ class OvmmPerception:
         self.verbose = verbose
         if self._detection_module == "detic":
             # Lazy import
-            from home_robot.perception.detection.detic.detic_perception import (
+            from objectnav_zoo.perception.detection.detic.detic_perception import (
                 DeticPerception,
             )
 
@@ -51,7 +52,7 @@ class OvmmPerception:
                 **module_kwargs,
             )
         elif self._detection_module == "grounded_sam":
-            from home_robot.perception.detection.grounded_sam.grounded_sam_perception import (
+            from objectnav_zoo.perception.detection.grounded_sam.grounded_sam_perception import (
                 GroundedSAMPerception,
             )
 
@@ -170,13 +171,13 @@ def read_category_map_file(
     Returns object and receptacle mappings.
     """
     try:
-        if os.environ["HOME_ROBOT_ROOT"]:
+        if os.environ["objectnav_zoo_ROOT"]:
             category_map_file = os.path.join(
-                os.environ["HOME_ROBOT_ROOT"], category_map_file
+                os.environ["objectnav_zoo_ROOT"], category_map_file
             )
     except KeyError:
         logger.warning(
-            "HOME_ROBOT_ROOT environment variable not set when initializing perception!"
+            "objectnav_zoo_ROOT environment variable not set when initializing perception!"
         )
 
     with open(category_map_file) as f:

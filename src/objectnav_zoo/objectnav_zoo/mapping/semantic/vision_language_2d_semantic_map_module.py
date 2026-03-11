@@ -12,9 +12,10 @@ import numpy as np
 import skimage.morphology
 import torch
 import torch.nn as nn
-from home_robot.agent.perception.detection.lseg import load_lseg_for_inference
 from torch import IntTensor, Tensor
 from torch.nn import functional as F
+
+from objectnav_zoo.agent.perception.detection.lseg import load_lseg_for_inference
 
 
 class VisionLanguage2DSemanticMapModule(nn.Module):

@@ -12,8 +12,9 @@ from typing import Callable, List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
-from home_robot.motion.base import Planner, PlanResult
-from home_robot.motion.space import ConfigurationSpace, Node
+
+from objectnav_zoo.motion.base import Planner, PlanResult
+from objectnav_zoo.motion.space import ConfigurationSpace, Node
 
 
 class TreeNode:

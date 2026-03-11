@@ -16,10 +16,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
-from home_robot.agent.imagenav_agent.SuperGluePretrainedNetwork.models.matching import (
+from torch import Tensor
+
+from objectnav_zoo.agent.imagenav_agent.SuperGluePretrainedNetwork.models.matching import (
     Matching as SGPMatching,
 )
-from torch import Tensor
 
 matplotlib.use("Agg")
 

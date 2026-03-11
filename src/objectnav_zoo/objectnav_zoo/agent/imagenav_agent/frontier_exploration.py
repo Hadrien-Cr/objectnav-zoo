@@ -8,8 +8,9 @@ import numpy as np
 import skimage.morphology
 import torch
 import torch.nn as nn
-from home_robot.mapping.semantic.constants import MapConstants as MC
-from home_robot.utils.morphology import binary_dilation, binary_erosion
+
+from objectnav_zoo.mapping.semantic.constants import MapConstants as MC
+from objectnav_zoo.utils.morphology import binary_dilation, binary_erosion
 
 
 class FrontierExplorationPolicy(nn.Module):

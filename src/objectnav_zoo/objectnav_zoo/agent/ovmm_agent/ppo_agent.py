@@ -29,18 +29,19 @@ from habitat_baselines.common.obs_transformers import (
 )
 from habitat_baselines.config.default import get_config as get_habitat_config
 from habitat_baselines.utils.common import batch_obs
-from home_robot.agent.ovmm_agent.complete_obs_space import get_complete_obs_space
-from home_robot.core.interfaces import (
+from omegaconf import OmegaConf
+
+from objectnav_zoo.agent.ovmm_agent.complete_obs_space import get_complete_obs_space
+from objectnav_zoo.core.interfaces import (
     ContinuousFullBodyAction,
     ContinuousNavigationAction,
     DiscreteNavigationAction,
     Observations,
 )
-from home_robot.utils.constants import (
+from objectnav_zoo.utils.constants import (
     MAX_DEPTH_REPLACEMENT_VALUE,
     MIN_DEPTH_REPLACEMENT_VALUE,
 )
-from omegaconf import OmegaConf
 
 random_generator = np.random.RandomState()
 

@@ -8,11 +8,12 @@ from typing import Any, Dict, List, Tuple
 import home_robot.utils.pose as pu
 import numpy as np
 import torch
-from home_robot.core.abstract_agent import Agent
-from home_robot.core.interfaces import DiscreteNavigationAction, Observations
-from home_robot.mapping.geometric.geometric_map_state import GeometricMapState
-from home_robot.navigation_planner.discrete_planner import DiscretePlanner
 from torch.nn import DataParallel
+
+from objectnav_zoo.core.abstract_agent import Agent
+from objectnav_zoo.core.interfaces import DiscreteNavigationAction, Observations
+from objectnav_zoo.mapping.geometric.geometric_map_state import GeometricMapState
+from objectnav_zoo.navigation_planner.discrete_planner import DiscretePlanner
 
 from .exploration_agent_module import ExplorationAgentModule
 

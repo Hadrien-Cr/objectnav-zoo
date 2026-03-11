@@ -26,7 +26,7 @@ coco_categories = {
 
 ### Inference Usage
 ```
-from home_robot.agent.perception.detection.coco_maskrcnn.coco_maskrcnn import COCOMaskRCNN
+from objectnav_zoo.agent.perception.detection.coco_maskrcnn.coco_maskrcnn import COCOMaskRCNN
 
 segmentation = COCOMaskRCNN(
     sem_pred_prob_thr=0.9,  # prediction threshold

@@ -9,14 +9,15 @@ from typing import Any, Dict, List, Optional, Tuple
 import home_robot.utils.pose as pu
 import numpy as np
 import torch
-from home_robot.core.abstract_agent import Agent
-from home_robot.core.interfaces import DiscreteNavigationAction, Observations
-from home_robot.mapping.instance import InstanceMemory
-from home_robot.mapping.semantic.categorical_2d_semantic_map_state import (
+from torch.nn import DataParallel
+
+from objectnav_zoo.core.abstract_agent import Agent
+from objectnav_zoo.core.interfaces import DiscreteNavigationAction, Observations
+from objectnav_zoo.mapping.instance import InstanceMemory
+from objectnav_zoo.mapping.semantic.categorical_2d_semantic_map_state import (
     Categorical2DSemanticMapState,
 )
-from home_robot.navigation_planner.discrete_planner import DiscretePlanner
-from torch.nn import DataParallel
+from objectnav_zoo.navigation_planner.discrete_planner import DiscretePlanner
 
 from .objectnav_agent_module import ObjectNavAgentModule
 

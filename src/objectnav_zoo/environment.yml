@@ -4,18 +4,13 @@ channels:
   - nvidia
   - conda-forge
   - pyg
-  - aihabitat
 dependencies:
-  - cudatoolkit=11.7
-  - python==3.9.*
-  - cmake <3.5
+  - cudatoolkit-dev=11.7
+  - python=3.10.*
+  - cmake=3.14.0
   - pybind11
-  - gcc=10.4.0
-  - gxx=10.4.0
   - pytorch=1.13.1
   - pytorch-cuda=11.7
-  - withbullet
-  - habitat-sim==0.2.5
   - pytorch3d
   - torchvision
   - torchaudio
@@ -26,35 +21,32 @@ dependencies:
   - exa # optional: nice ls
   - fzf # optional: fancy ctrl + R
   - pip
+  - habitat-sim=0.3.3
   - pip:
     - gym>=0.22.0,<0.23.1
+    - setuptools <70
     - yacs>=0.1.8
+    - numpy-quaternion-2023.0.4
     - attrs>=19.1.0
-    - numpy <1.24 # certain deprecated operations were used in other deps
-    - numba <0.60
+    - numpy=1.23.5
     - scipy
+    - sophuspy
     - pybullet
     - trimesh<4
     - pytest
     - scikit-image
     - scikit-fmm
     - scikit-learn
-    - numpy-quaternion
     - natsort
     - frozendict
-    # Robots
     - opencv-python
     - pin>=2.6.17
-    # Neural networks
     - openai-clip
     - timm
     - pandas>=2
     - mss
-    # visualizations and debugging
     - matplotlib>=3
-    # Command line tools
     - click
-    # data tools
     - pillow<10.0.0
     - atomicwrites
     - loguru
@@ -63,12 +55,4 @@ dependencies:
     - imageio
     - pygifsicle
     - pynput
-      # - git+https://github.com/openai/CLIP.git
     - open3d>=0.17
-    - imutils
-    - natsort
-    - scikit-fmm
-    - scikit-learn
-    - scikit-image
-    - trimesh
-

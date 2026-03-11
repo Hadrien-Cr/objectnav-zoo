@@ -9,11 +9,15 @@ from typing import List, Optional, Tuple
 import home_robot.utils.bullet as hrb
 import numpy as np
 import pybullet as pb
-from home_robot.core.interfaces import ContinuousFullBodyAction
-from home_robot.motion.bullet import BulletRobotModel, PybulletIKSolver
-from home_robot.motion.pinocchio_ik_solver import PinocchioIKSolver, PositionIKOptimizer
-from home_robot.motion.robot import Footprint
-from home_robot.utils.pose import to_matrix
+
+from objectnav_zoo.core.interfaces import ContinuousFullBodyAction
+from objectnav_zoo.motion.bullet import BulletRobotModel, PybulletIKSolver
+from objectnav_zoo.motion.pinocchio_ik_solver import (
+    PinocchioIKSolver,
+    PositionIKOptimizer,
+)
+from objectnav_zoo.motion.robot import Footprint
+from objectnav_zoo.utils.pose import to_matrix
 
 # Stretch stuff
 DEFAULT_STRETCH_URDF = "assets/hab_stretch/urdf/stretch_dex_wrist_simplified.urdf"

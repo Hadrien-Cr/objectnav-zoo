@@ -10,8 +10,9 @@ from enum import IntEnum, auto
 from typing import Any, Dict, Optional, Tuple
 
 import torch
-from home_robot.agent.ovmm_agent.ovmm_agent import OpenVocabManipAgent
-from home_robot.core.interfaces import DiscreteNavigationAction, Observations
+
+from objectnav_zoo.agent.ovmm_agent.ovmm_agent import OpenVocabManipAgent
+from objectnav_zoo.core.interfaces import DiscreteNavigationAction, Observations
 
 
 class Skill(IntEnum):

@@ -3,7 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import pybullet as pb
-from home_robot.motion.robot import Robot
+
+from objectnav_zoo.motion.robot import Robot
 
 DEFAULT_FRANKA_URDF = "assets/franka_panda/panda.urdf"
 DEFAULT_CALVIN_FRANKA_URDF = "assets/franka_panda/panda_calvin.urdf"

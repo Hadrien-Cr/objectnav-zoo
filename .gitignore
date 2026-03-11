@@ -25,7 +25,6 @@ datasets/
 scene_datasets/
 datadump/
 */datasets/
-!/src/home_robot/home_robot/datasets
 data/
 /models/
 

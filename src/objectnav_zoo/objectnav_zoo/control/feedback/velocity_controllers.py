@@ -6,8 +6,9 @@ import abc
 from typing import Optional, Tuple
 
 import numpy as np
-from home_robot.utils.geometry import normalize_ang_error
 from omegaconf import DictConfig
+
+from objectnav_zoo.utils.geometry import normalize_ang_error
 
 
 class DiffDriveVelocityController(abc.ABC):
