@@ -112,7 +112,7 @@ class MyTopDownMap(Measure):
         if self._config.draw_goal_aabbs:
             for goal in episode.goals:
                 try:
-                    sem_scene = self._sim.semantic_annotations()
+                    sem_scene = self._sim.semantic_scene.objects
                     object_id = goal.object_id
                     assert int(sem_scene.objects[object_id].id.split("_")[-1]) == int(
                         goal.object_id

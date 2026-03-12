@@ -15,7 +15,9 @@ from objectnav_zoo.env.habitat_imagenav_env.habitat_imagenav_env import (
 )
 
 if __name__ == "__main__":
-    config, config_str = get_config("configs/instance_imagenav_hm3d.yaml")
+    config, config_str = get_config(
+        "projects/instanceimagenav/configs/instance_imagenav_hm3d.yaml"
+    )
     print("Config:\n", config_str, "\n", "-" * 100)
 
     env = HabitatImageNavEnv(Env(config=config.habitat), config=config)

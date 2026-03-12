@@ -304,7 +304,9 @@ class ExplorationAgent(Agent):
 
         camera_pose = obs.camera_pose
         if camera_pose is not None:
-            camera_pose = torch.tensor(np.asarray(camera_pose)).unsqueeze(0)
+            camera_pose = (
+                torch.tensor(np.asarray(camera_pose)).unsqueeze(0).to(self.device)
+            )
         return (
             obs_preprocessed,
             pose_delta,

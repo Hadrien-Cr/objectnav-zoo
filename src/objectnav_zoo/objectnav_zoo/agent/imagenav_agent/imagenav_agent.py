@@ -51,6 +51,8 @@ class IINAgentModule(nn.Module):
             explored_radius=config.semantic_map.explored_radius,
             been_close_to_radius=config.semantic_map.been_close_to_radius,
             global_downscaling=config.semantic_map.global_downscaling,
+            max_depth=config.habitat.simulator.agents.main_agent.sim_sensors.depth_sensor.max_depth,
+            min_depth=config.habitat.simulator.agents.main_agent.sim_sensors.depth_sensor.min_depth,
             du_scale=config.semantic_map.du_scale,
             cat_pred_threshold=config.semantic_map.cat_pred_threshold,
             exp_pred_threshold=config.semantic_map.exp_pred_threshold,
@@ -348,7 +350,8 @@ class ImageNavAgent(Agent):
             info = {
                 **planner_inputs[0],
                 **vis_inputs[0],
-                "semantic_frame": obs.rgb,
+                "rgb_frame": obs.rgb,
+                "depth_frame": obs.depth,
                 "closest_goal_map": closest_goal_map,
                 "last_goal_image": obs.task_observations["instance_imagegoal"],
                 "last_collisions": collision,

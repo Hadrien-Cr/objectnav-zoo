@@ -43,14 +43,18 @@ pip install --no-build-isolation 'git+https://github.com/facebookresearch/detect
 read -p "Press Enter to continue to Detic install" enter
 cd $ZOO_ROOT
 git submodule update --init --recursive src/objectnav_zoo/objectnav_zoo/perception/detection/detic/Detic
-pip install -r $ZOO_ROO/src/objectnav_zoo/objectnav_zoo/perception/detection/detic/Detic/requirements.txt
+pip install -r $ZOO_ROOT/src/objectnav_zoo/objectnav_zoo/perception/detection/detic/Detic/requirements.txt
 
-mkdir $ZOO_ROOT/src/src/objectnav_zoo/objectnav_zoo/perception/detection/detic/Detic/models
-wget --no-check-certificate https://dl.fbaipublicfiles.com/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth -O $ZOO_ROOT/src/src/objectnav_zoo/objectnav_zoo/perception/detection/detic/Detic/models/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth
+mkdir $ZOO_ROOT/src/objectnav_zoo/objectnav_zoo/perception/detection/detic/Detic/models
+if ! [ -f $ZOO_ROOT/src/objectnav_zoo/objectnav_zoo/perception/detection/detic/Detic/models/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth ]; then
+    wget --no-check-certificate https://dl.fbaipublicfiles.com/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth -P $ZOO_ROOT/src/objectnav_zoo/objectnav_zoo/perception/detection/detic/Detic/models/
+fi
 
 # MiDaS
 read -p "Press Enter to continue to MiDaS install" enter
-wget --no-check-certificate https://github.com/isl-org/MiDaS/releases/download/v3_1/dpt_beit_large_512.pt -O $ZOO_ROOT/src/third_party/MiDaS/weights/dpt_beit_large_512.pt
+if ! [ -f $ZOO_ROOT/src/third_party/MiDaS/weights/dpt_beit_large_512.pt ]; then
+    wget --no-check-certificate https://github.com/isl-org/MiDaS/releases/download/v3_1/dpt_beit_large_512.pt -P $ZOO_ROOT/src/third_party/MiDaS/weights/
+fi
 
 # Grounded SAM 
 read -p "Press Enter to continue to Grounded SAM install" enter

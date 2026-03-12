@@ -47,6 +47,25 @@ class HabitatImageNavEnv(HabitatEnv):
         """Translate Habitat observations into objectnav_zoo observations."""
         depth = self._preprocess_depth(habitat_obs["depth"])
 
+        # Get agent state and compute camera pose
+        agent_state = self.habitat_env._sim.get_agent_state()
+        position = np.array(
+            agent_state.position, dtype=np.float32
+        )  # Ensure 1D array [x, y, z]
+        rot_x, rot_y, rot_z, rot_w = (
+            float(agent_state.rotation.x),
+            float(agent_state.rotation.y),
+            float(agent_state.rotation.z),
+            float(agent_state.rotation.w),
+        )
+        quat = np.array([rot_w, rot_x, rot_y, rot_z], dtype=np.float32)
+        from scipy.spatial.transform import Rotation as R
+
+        rotation_matrix = R.from_quat(quat).as_matrix()  # 3x3 rotation matrix
+        camera_pose = np.eye(4)
+        camera_pose[:3, :3] = rotation_matrix
+        camera_pose[:3, 3] = position
+
         task_observations = {"instance_imagegoal": habitat_obs["instance_imagegoal"]}
         metrics = self.get_episode_metrics()
         for k in ["collisions", "top_down_map"]:
@@ -60,6 +79,7 @@ class HabitatImageNavEnv(HabitatEnv):
             depth=depth,
             compass=habitat_obs["compass"],
             gps=gps,
+            camera_pose=camera_pose,
             task_observations=task_observations,
         )
 

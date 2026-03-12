@@ -20,6 +20,7 @@ from habitat.utils.visualizations.utils import (
 )
 from natsort import natsorted
 from PIL import Image
+from torch import det
 
 import objectnav_zoo.utils.pose as pu
 from objectnav_zoo.perception.constants import PaletteIndices as PI
@@ -191,7 +192,8 @@ class NavVisualizer:
         sensor_pose: np.ndarray,
         found_goal: bool,
         explored_map: np.ndarray,
-        semantic_frame: np.ndarray,
+        rgb_frame: np.ndarray,
+        depth_frame: np.ndarray,
         timestep: int,
         last_goal_image,
         last_td_map: Dict[str, Any] = None,
@@ -236,12 +238,22 @@ class NavVisualizer:
             obstacle_map = dilated_obstacle_map
 
         goal_frame = self.make_goal(last_goal_image)
-        obs_frame = self.make_observations(
-            semantic_frame,
+        obs_rgb_frame = self.make_observations_rgb(
+            rgb_frame,
             last_collisions["is_collision"],
             found_goal,
             metrics,
         )
+
+        max_depth = 25.0
+        depth_frame_int8 = ((max_depth - depth_frame) / max_depth * 255).astype(
+            np.uint8
+        )
+        obs_depth_frame = self.make_observations_depth(
+            depth_frame_int8,
+            metrics,
+        )
+
         map_pred_frame = self.make_map_preds(
             sensor_pose,
             obstacle_map,
@@ -258,10 +270,13 @@ class NavVisualizer:
 
         if td_map_frame is None:
             frame = np.concatenate(
-                [goal_frame, obs_frame, map_pred_frame, kp_frame], axis=1
+                [goal_frame, obs_rgb_frame, obs_depth_frame, map_pred_frame, kp_frame],
+                axis=1,
             )
         else:
-            upper_frame = np.concatenate([goal_frame, obs_frame, kp_frame], axis=1)
+            upper_frame = np.concatenate(
+                [goal_frame, obs_rgb_frame, obs_depth_frame, kp_frame], axis=1
+            )
             lower_frame = self.pad_frame(
                 np.concatenate([map_pred_frame, td_map_frame], axis=1),
                 upper_frame.shape[1],
@@ -359,7 +374,7 @@ class NavVisualizer:
         )
         return frame
 
-    def make_observations(
+    def make_observations_rgb(
         self,
         sem_img: np.ndarray,
         collision: bool,
@@ -397,6 +412,49 @@ class NavVisualizer:
         thickness = 2
 
         text = "Observation"
+        textsize = cv2.getTextSize(text, font, fontScale, thickness)[0]
+        textX = (w - textsize[0]) // 2
+        textY = (text_bar_height + border_size + textsize[1]) // 2
+        frame = cv2.putText(
+            frame,
+            text,
+            (textX, textY),
+            font,
+            fontScale,
+            color,
+            thickness,
+            cv2.LINE_AA,
+        )
+        return frame
+
+    def make_observations_depth(
+        self,
+        sem_img: np.ndarray,
+        metrics: Dict[str, float],
+    ) -> np.ndarray:
+        """
+        make the egocentric depth observation sub-frame.
+        """
+        border_size = 10
+        text_bar_height = 50 - border_size
+        new_h = self.ind_frame_height - text_bar_height - 2 * border_size
+        new_w = int(new_h / sem_img.shape[0] * sem_img.shape[1])
+        sem_img = cv2.resize(sem_img, (new_w, new_h))
+        sem_img = self._write_metrics(sem_img, metrics)
+
+        sem_img = cv2.cvtColor(sem_img, cv2.COLOR_RGB2BGR)
+        sem_img = self._add_border(sem_img, border_size)
+        w = sem_img.shape[1]
+
+        top_bar = np.ones((text_bar_height, w, 3), dtype=np.uint8) * 255
+        frame = np.concatenate([top_bar, sem_img.astype(np.uint8)], axis=0)
+
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        fontScale = 0.8
+        color = (20, 20, 20)
+        thickness = 2
+
+        text = "Depth"
         textsize = cv2.getTextSize(text, font, fontScale, thickness)[0]
         textX = (w - textsize[0]) // 2
         textY = (text_bar_height + border_size + textsize[1]) // 2

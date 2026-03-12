@@ -168,6 +168,7 @@ class Categorical2DSemanticMapModule(nn.Module):
         self.exploration_type = exploration_type
         self.gaze_width = gaze_width
         self.gaze_distance = gaze_distance
+        self.t = 0
 
     @torch.no_grad()
     def forward(
@@ -425,46 +426,35 @@ class Categorical2DSemanticMapModule(nn.Module):
              and location of shape (batch_size, MC.NON_SEM_CHANNELS + num_sem_categories, M, M)
             current_pose: current pose updated with pose delta of shape (batch_size, 3)
         """
+        self.t += 1
+
         if semantic_max_val is None:
             semantic_max_val = self.num_sem_categories
         batch_size, obs_channels, h, w = obs.size()
         device, dtype = obs.device, obs.dtype
+
         if camera_pose is not None:
-            # TODO: make consistent between sim and real
-            # hab_angles = pt.matrix_to_euler_angles(camera_pose[:, :3, :3], convention="YZX")
-            # angles = pt.matrix_to_euler_angles(camera_pose[:, :3, :3], convention="ZYX")
             angles = torch.Tensor(
                 [tra.euler_from_matrix(p[:3, :3].cpu(), "rzyx") for p in camera_pose]
-            )
-
-            # For habitat - pull x angle
-            # tilt = angles[:, -1]
-            # For real robot
-            tilt = angles[:, 1]
-            # angles gives roll, pitch, yaw
-            yaw = angles[:, -1]
-            roll = angles[:, 0]
+            ).to(device)
+            tilt = torch.zeros(batch_size).to(device)
+            yaw = angles[:, 1]
+            roll = torch.zeros(batch_size).to(device)
             camera_x = camera_pose[:, 0, 3] * -100
             camera_y = camera_pose[:, 1, 3] * -100
-            # Get the agent pose
-            # hab_agent_height = camera_pose[:, 1, 3] * 100
-            agent_pos = camera_pose[:, :3, 3] * 100
-            agent_height = agent_pos[:, 2]
+            agent_height = torch.tensor([self.agent_height]).to(device)
 
-            if debug:
-                print("tilt", tilt)
-                print("agent_height", agent_height)
-                print()
         else:
-            yaw = 0
-            roll = 0
+            yaw = torch.zeros(batch_size).to(device)
+            roll = torch.zeros(batch_size).to(device)
             camera_x = None
             camera_y = None
-            tilt = torch.zeros(batch_size)
-            agent_height = self.agent_height
+            tilt = torch.zeros(batch_size).to(device)
+            agent_height = torch.tensor([self.agent_height]).to(device)
 
         if not isinstance(yaw, torch.Tensor):
             yaw = torch.tensor(yaw)
+
         depth = obs[:, 3, :, :].float()
         depth[depth > self.max_depth] = 0
 
@@ -472,50 +462,54 @@ class Categorical2DSemanticMapModule(nn.Module):
             depth, self.camera_matrix, device, scale=self.du_scale
         )
 
-        if self.debug_mode:
-            from objectnav_zoo.utils.point_cloud import show_point_cloud
-
-            rgb = obs[:, :3, :: self.du_scale, :: self.du_scale].permute(0, 2, 3, 1)
-            xyz = point_cloud_t[0].reshape(-1, 3)
-            rgb = rgb[0].reshape(-1, 3)
-            print("-> Showing point cloud in camera coords")
-            show_point_cloud(
-                (xyz / 100.0).cpu().numpy(),
-                (rgb / 255.0).cpu().numpy(),
-                orig=np.zeros(3),
-            )
-
         point_cloud_base_coords = du.transform_camera_view_t(
             point_cloud_t, agent_height, torch.rad2deg(tilt).cpu().numpy(), device
-        )
-
-        # Show the point cloud in base coordinates for debugging
-        if self.debug_mode:
-            print()
-            print("------------------------------")
-            print("agent angles =", angles)
-            print("agent tilt   =", tilt)
-            print("agent height =", agent_height, "preset =", self.agent_height)
-            xyz = point_cloud_base_coords[0].reshape(-1, 3)
-            print("-> Showing point cloud in base coords")
-            show_point_cloud(
-                (xyz / 100.0).cpu().numpy(),
-                (rgb / 255.0).cpu().numpy(),
-                orig=np.zeros(3),
-            )
+        )  # correct to "ground as reference"
 
         point_cloud_map_coords = du.transform_pose_t(
             point_cloud_base_coords, self.shift_loc, device
         )
 
+        # Show the point cloud in base coordinates for debugging
         if self.debug_mode:
-            xyz = point_cloud_base_coords[0].reshape(-1, 3)
-            print("-> Showing point cloud in map coords")
-            show_point_cloud(
-                (xyz / 100.0).cpu().numpy(),
-                (rgb / 255.0).cpu().numpy(),
-                orig=np.zeros(3),
-            )
+            from objectnav_zoo.utils.point_cloud import show_point_cloud
+
+            print("------------------------------")
+            print("agent tilt   =", tilt[0])
+            print("agent roll   =", roll[0])
+            print("agent yaw    =", yaw[0])
+            print("agent height =", agent_height[0])
+            current_pose = pu.get_new_pose_batch(prev_pose.clone(), pose_delta)
+            print("agent pose   =", current_pose[0])
+
+            # print("-> Showing point cloud in camera coords")
+            # rgb_pc = obs[:, :3, :: self.du_scale, :: self.du_scale].permute(0, 2, 3, 1)
+            # xyz_pc = point_cloud_t[0].reshape(-1, 3)
+            # rgb_pc = rgb_pc[0].reshape(-1, 3)
+            # show_point_cloud(
+            #     (xyz_pc / 100.0).cpu().numpy(),
+            #     (rgb_pc / 255.0).cpu().numpy(),
+            #     save=f"datadump/pcd_frame{self.t}.png",
+            #     orig=np.zeros(3),
+            # )
+
+            # print("-> Showing point cloud in base coords")
+            # xyz_pc = point_cloud_base_coords[0].reshape(-1, 3)
+            # show_point_cloud(
+            #     (xyz_pc / 100.0).cpu().numpy(),
+            #     (rgb_pc / 255.0).cpu().numpy(),
+            #     orig=np.zeros(3),
+            #     save=f"datadump/pcd_frame{self.t}_base_coords.png"
+            # )
+            # xyz_pc = point_cloud_map_coords[0].reshape(-1, 3)
+
+            # print("-> Showing point cloud in map coords")
+            # show_point_cloud(
+            #     (xyz_pc / 100.0).cpu().numpy(),
+            #     (rgb_pc / 255.0).cpu().numpy(),
+            #     save=f"datadump/pcd_frame{self.t}_map_coords.png",
+            #     orig=np.zeros(3),
+            # )
 
         voxel_channels = 1 + self.num_sem_categories
         num_instance_channels = 0
@@ -545,8 +539,6 @@ class Categorical2DSemanticMapModule(nn.Module):
         )
 
         semantic_channels = obs[:, 4 : 4 + self.num_sem_categories, :, :]
-
-        current_pose = pu.get_new_pose_batch(prev_pose.clone(), pose_delta)
 
         current_pose = pu.get_new_pose_batch(prev_pose.clone(), pose_delta)
 

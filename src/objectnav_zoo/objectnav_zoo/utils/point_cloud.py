@@ -63,10 +63,24 @@ def show_pcd(
     geoms = create_visualization_geometries(
         pcd=pcd, orig=orig, R=R, grasps=grasps, size=size
     )
-    o3d.visualization.draw_geometries(geoms)
+    combined = o3d.geometry.TriangleMesh()
+    for geom in geoms:
+        if isinstance(geom, o3d.geometry.PointCloud):
+            points = np.asarray(geom.points)
+            colors = np.asarray(geom.colors) if geom.has_colors() else None
+            for i, point in enumerate(points):
+                sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.03)
+                sphere.translate(point)
+                if colors is not None:
+                    sphere.paint_uniform_color(colors[i])
+                combined += sphere
+        elif isinstance(geom, o3d.geometry.TriangleMesh):
+            combined += geom
+    o3d.io.write_triangle_mesh(save.replace(".png", ".ply"), combined)
+    # o3d.visualization.draw_geometries(geoms)
 
-    if save is not None:
-        save_geometries_as_image(geoms, output_path=save)
+    # if save is not None:
+    #     save_geometries_as_image(geoms, output_path=save)
 
 
 def create_visualization_geometries(

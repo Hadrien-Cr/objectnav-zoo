@@ -286,6 +286,7 @@ class GeometricMapModule(nn.Module):
 
         depth = obs[:, 3, :, :].float()
         depth[depth > self.max_depth] = 0
+        print(depth)
         point_cloud_t = du.get_point_cloud_from_z_t(
             depth, self.camera_matrix, device, scale=self.du_scale
         )
