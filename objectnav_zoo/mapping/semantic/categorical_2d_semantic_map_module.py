@@ -20,8 +20,8 @@ import objectnav_zoo.mapping.map_utils as mu
 import objectnav_zoo.utils.depth as du
 import objectnav_zoo.utils.pose as pu
 import objectnav_zoo.utils.rotation as ru
-from objectnav_zoo.mapping.instance import InstanceMemory
 from objectnav_zoo.mapping.semantic.constants import MapConstants as MC
+from objectnav_zoo.mapping.semantic.instance_tracking_modules import InstanceMemory
 from objectnav_zoo.utils.spot import draw_circle_segment, fill_convex_hull
 
 # For debugging input and output maps - shows matplotlib visuals
@@ -72,7 +72,6 @@ class Categorical2DSemanticMapModule(nn.Module):
         evaluate_instance_tracking: bool = False,
         instance_memory: Optional[InstanceMemory] = None,
         max_instances: int = 0,
-        instance_association: str = "map_overlap",
         dilation_for_instances: int = 5,
         padding_for_instance_overlap: int = 5,
         exploration_type="default",
@@ -148,6 +147,10 @@ class Categorical2DSemanticMapModule(nn.Module):
         self.min_mapped_height = int(
             self.min_obs_height_cm / self.z_resolution - self.min_voxel_height
         )
+
+        # self.old_x = None
+        # self.old_y = None
+
         self.max_mapped_height = int(
             (self.agent_height + 1) / self.z_resolution - self.min_voxel_height
         )
@@ -159,7 +162,6 @@ class Categorical2DSemanticMapModule(nn.Module):
         self.dilate_size = dilate_size
         self.dilate_iter = dilate_iter
         self.record_instance_ids = record_instance_ids
-        self.instance_association = instance_association
         self.padding_for_instance_overlap = padding_for_instance_overlap
         self.dilation_for_instances = dilation_for_instances
         self.instance_memory = instance_memory
@@ -168,7 +170,6 @@ class Categorical2DSemanticMapModule(nn.Module):
         self.exploration_type = exploration_type
         self.gaze_width = gaze_width
         self.gaze_distance = gaze_distance
-        self.t = 0
 
     @torch.no_grad()
     def forward(
@@ -187,7 +188,6 @@ class Categorical2DSemanticMapModule(nn.Module):
         seq_obstacle_locations: Optional[Tensor] = None,
         seq_free_locations: Optional[Tensor] = None,
         blacklist_target: bool = False,
-        semantic_max_val: Optional[int] = None,
     ) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor, IntTensor, Tensor]:
         """Update maps and poses with a sequence of observations and generate map
         features at each time step.
@@ -286,7 +286,6 @@ class Categorical2DSemanticMapModule(nn.Module):
                 else None,
                 seq_free_locations[:, t] if seq_free_locations is not None else None,
                 blacklist_target,
-                semantic_max_val=semantic_max_val,
             )
             for e in range(batch_size):
                 if seq_update_global[e, t]:
@@ -394,6 +393,42 @@ class Categorical2DSemanticMapModule(nn.Module):
 
         return curr_map
 
+    def draw_line(self, matrix, x1, y1, x2, y2, padding=1):
+        dx = abs(x2 - x1)
+        dy = abs(y2 - y1)
+        
+        if x1 < x2:
+            sx = 1
+        else:
+            sx = -1
+        if y1 < y2:
+            sy = 1
+        else:
+            sy = -1
+        
+        err = dx - dy
+        
+        while True:
+            for i in range(-padding, padding + 1):
+                for j in range(-padding, padding + 1):
+                    x = x1 + i
+                    y = y1 + j
+                    if 0 <= x < matrix.shape[2] and 0 <= y < matrix.shape[1]:
+                        matrix[0, y, x] = 1  # Set x-value to 1
+                        matrix[1, y, x] = 1  # Set y-value to 1
+            
+            if x1 == x2 and y1 == y2:
+                break
+            
+            e2 = 2 * err
+            if e2 > -dy:
+                err -= dy
+                x1 += sx
+            if e2 < dx:
+                err += dx
+                y1 += sy
+
+
     def _update_local_map_and_pose(  # noqa: C901
         self,
         obs: Tensor,
@@ -407,7 +442,6 @@ class Categorical2DSemanticMapModule(nn.Module):
         free_locations: Optional[Tensor] = None,
         blacklist_target: bool = False,
         debug: bool = False,
-        semantic_max_val: Optional[int] = None,
     ) -> Tuple[Tensor, Tensor]:
         """Update local map and sensor pose given a new observation using parameter-free
         differentiable projective geometry.
@@ -426,35 +460,38 @@ class Categorical2DSemanticMapModule(nn.Module):
              and location of shape (batch_size, MC.NON_SEM_CHANNELS + num_sem_categories, M, M)
             current_pose: current pose updated with pose delta of shape (batch_size, 3)
         """
-        self.t += 1
-
-        if semantic_max_val is None:
-            semantic_max_val = self.num_sem_categories
         batch_size, obs_channels, h, w = obs.size()
         device, dtype = obs.device, obs.dtype
-
         if camera_pose is not None:
+            # TODO: make consistent between sim and real
+            # hab_angles = pt.matrix_to_euler_angles(camera_pose[:, :3, :3], convention="YZX")
+            # angles = pt.matrix_to_euler_angles(camera_pose[:, :3, :3], convention="ZYX")
             angles = torch.Tensor(
                 [tra.euler_from_matrix(p[:3, :3].cpu(), "rzyx") for p in camera_pose]
-            ).to(device)
-            tilt = torch.zeros(batch_size).to(device)
-            yaw = angles[:, 1]
-            roll = torch.zeros(batch_size).to(device)
-            camera_x = camera_pose[:, 0, 3] * -100
-            camera_y = camera_pose[:, 1, 3] * -100
-            agent_height = torch.tensor([self.agent_height]).to(device)
+            )
 
+            # For habitat - pull x angle
+            # tilt = angles[:, -1]
+            # For real robot
+            tilt = angles[:, 1]
+            # angles gives roll, pitch, yaw
+            yaw = angles[:, -1]
+
+            # Get the agent pose
+            # hab_agent_height = camera_pose[:, 1, 3] * 100
+            agent_pos = camera_pose[:, :3, 3] * 100
+            agent_height = agent_pos[:, 2]
+
+            if debug:
+                print("tilt", tilt)
+                print("agent_height", agent_height)
+                print()
         else:
-            yaw = torch.zeros(batch_size).to(device)
-            roll = torch.zeros(batch_size).to(device)
-            camera_x = None
-            camera_y = None
-            tilt = torch.zeros(batch_size).to(device)
-            agent_height = torch.tensor([self.agent_height]).to(device)
+            yaw = 0
+            tilt = torch.zeros(batch_size)
+            agent_height = self.agent_height
 
-        if not isinstance(yaw, torch.Tensor):
-            yaw = torch.tensor(yaw)
-
+        yaw = torch.tensor(yaw)
         depth = obs[:, 3, :, :].float()
         depth[depth > self.max_depth] = 0
 
@@ -464,52 +501,11 @@ class Categorical2DSemanticMapModule(nn.Module):
 
         point_cloud_base_coords = du.transform_camera_view_t(
             point_cloud_t, agent_height, torch.rad2deg(tilt).cpu().numpy(), device
-        )  # correct to "ground as reference"
+        )
 
         point_cloud_map_coords = du.transform_pose_t(
             point_cloud_base_coords, self.shift_loc, device
         )
-
-        # Show the point cloud in base coordinates for debugging
-        if self.debug_mode:
-            from objectnav_zoo.utils.point_cloud import show_point_cloud
-
-            print("------------------------------")
-            print("agent tilt   =", tilt[0])
-            print("agent roll   =", roll[0])
-            print("agent yaw    =", yaw[0])
-            print("agent height =", agent_height[0])
-            current_pose = pu.get_new_pose_batch(prev_pose.clone(), pose_delta)
-            print("agent pose   =", current_pose[0])
-
-            # print("-> Showing point cloud in camera coords")
-            # rgb_pc = obs[:, :3, :: self.du_scale, :: self.du_scale].permute(0, 2, 3, 1)
-            # xyz_pc = point_cloud_t[0].reshape(-1, 3)
-            # rgb_pc = rgb_pc[0].reshape(-1, 3)
-            # show_point_cloud(
-            #     (xyz_pc / 100.0).cpu().numpy(),
-            #     (rgb_pc / 255.0).cpu().numpy(),
-            #     save=f"datadump/pcd_frame{self.t}.png",
-            #     orig=np.zeros(3),
-            # )
-
-            # print("-> Showing point cloud in base coords")
-            # xyz_pc = point_cloud_base_coords[0].reshape(-1, 3)
-            # show_point_cloud(
-            #     (xyz_pc / 100.0).cpu().numpy(),
-            #     (rgb_pc / 255.0).cpu().numpy(),
-            #     orig=np.zeros(3),
-            #     save=f"datadump/pcd_frame{self.t}_base_coords.png"
-            # )
-            # xyz_pc = point_cloud_map_coords[0].reshape(-1, 3)
-
-            # print("-> Showing point cloud in map coords")
-            # show_point_cloud(
-            #     (xyz_pc / 100.0).cpu().numpy(),
-            #     (rgb_pc / 255.0).cpu().numpy(),
-            #     save=f"datadump/pcd_frame{self.t}_map_coords.png",
-            #     orig=np.zeros(3),
-            # )
 
         voxel_channels = 1 + self.num_sem_categories
         num_instance_channels = 0
@@ -552,27 +548,15 @@ class Categorical2DSemanticMapModule(nn.Module):
                 :,
                 :,
             ]
-            global_pose = current_pose + origins
-
-            if camera_x is None:
-                camera_x = global_pose[:, 0]
-            if camera_y is None:
-                camera_y = global_pose[:, 1]
-            global_pose = np.array([camera_x.item(), camera_y.item(), roll.item()])
-            absolute_point_cloud = du.transform_pose_t(
-                point_cloud_base_coords, global_pose, device
-            )
-
             if num_instance_channels > 0:
                 self.instance_memory.process_instances(
+                    semantic_channels,
                     instance_channels,
-                    absolute_point_cloud,
+                    point_cloud_t,
                     torch.concat([current_pose + origins, lmb], axis=1)
                     .cpu()
                     .float(),  # store the global pose
                     image=obs[:, :3, :, :],
-                    semantic_channels=semantic_channels,
-                    background_class_labels=[0, semantic_max_val],
                 )
 
         feat[:, 1:, :] = nn.AvgPool2d(self.du_scale)(obs[:, 4:, :, :]).view(
@@ -633,6 +617,7 @@ class Categorical2DSemanticMapModule(nn.Module):
             filled = fill_convex_hull(fp_exp_pred[0, 0].cpu())
             assert fp_exp_pred.shape[:2] == (1, 1)
             fp_exp_pred[0, 0] = torch.tensor(filled)
+
         # uses a fixed cone infront of the camerea
         elif self.exploration_type == "gaze":
             fp_exp_pred = torch.zeros_like(fp_map_pred)
@@ -784,10 +769,17 @@ class Categorical2DSemanticMapModule(nn.Module):
                 x - 2 : x + 3,
             ].fill_(1.0)
 
+            # if self.old_x and self.old_y:
+            #     # Draw a line from the previous location to the current location
+            #     self.draw_line(current_map[e, MC.CURRENT_LOCATION : MC.CURRENT_LOCATION + 2], x, y, self.old_x, self.old_y)
+
+            # self.old_x = x
+            # self.old_y = y
+
             # Set a disk around the agent to explored
             # This is around the current agent - we just sort of assume we know where we are
             try:
-                radius = self.explored_radius // self.resolution
+                radius = self.explored_radius
                 explored_disk = torch.from_numpy(skimage.morphology.disk(radius))
                 current_map[
                     e,
@@ -988,8 +980,7 @@ class Categorical2DSemanticMapModule(nn.Module):
         Args:
             extended_local_labels: Labels of instances in the extended local map.
             global_instances_within_local: Instances from the global map within the local map's region.
-            max_instance_id: The number of instance ids that are used up
-            local_instance_ids: The local instance ids for which local to global mapping is to be determined
+
         Returns:
             A mapping of local instance IDs to global instance IDs.
         """
@@ -1020,7 +1011,7 @@ class Categorical2DSemanticMapModule(nn.Module):
                 instance_mapping[local_instance_id.item()] = global_instance_id
                 max_instance_id += 1
             # update the id in instance memory
-            self.instance_memory.add_view_to_instance(
+            self.instance_memory.update_instance_id(
                 env_id, int(local_instance_id.item()), global_instance_id
             )
         instance_mapping[0.0] = 0
@@ -1091,7 +1082,7 @@ class Categorical2DSemanticMapModule(nn.Module):
         particular environment.
         """
 
-        if self.record_instance_ids and self.instance_association == "map_overlap":
+        if self.record_instance_ids:
             global_map = self._update_global_map_instances(
                 e, global_map, local_map, lmb
             )

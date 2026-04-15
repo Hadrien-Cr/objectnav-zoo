@@ -190,12 +190,6 @@ class DiscreteActionFMM:
         start = pu.threshold_poses(start, obstacle_map.shape)
         start = np.array(start)
 
-        if debug:
-            print()
-            print("--- Planning ---")
-            print("Found goal:", found_goal)
-            print("Goal points provided:", np.any(goal_map > 0))
-
         self.curr_pose = [start_x, start_y, start_o]
         self.visited_map[gx1:gx2, gy1:gy2][
             start[0] - 0 : start[0] + 1, start[1] - 0 : start[1] + 1
@@ -208,33 +202,25 @@ class DiscreteActionFMM:
         ):
             self._check_collision()
 
-        try:
-            # High-level goal -> short-term goal
-            # Extracts a local waypoint
-            # Defined by the step size - should be relatively close to the robot
-            (
-                short_term_goal,
-                closest_goal_map,
-                replan,
-                stop,
-                closest_goal_pt,
-                dilated_obstacles,
-            ) = self._get_short_term_goal(
-                obstacle_map,
-                np.copy(goal_map),
-                start,
-                planning_window,
-                plan_to_dilated_goal=use_dilation_for_stg,
-                frontier_map=frontier_map,
-            )
-        except Exception as e:
-            print("Warning! Planner crashed with error:", e)
-            return (
-                DiscreteNavigationAction.STOP,
-                np.zeros(goal_map.shape),
-                (0, 0),
-                np.zeros(goal_map.shape),
-            )
+        # High-level goal -> short-term goal
+        # Extracts a local waypoint
+        # Defined by the step size - should be relatively close to the robot
+        (
+            short_term_goal,
+            closest_goal_map,
+            replan,
+            stop,
+            closest_goal_pt,
+            dilated_obstacles,
+        ) = self._get_short_term_goal(
+            obstacle_map,
+            np.copy(goal_map),
+            start,
+            planning_window,
+            plan_to_dilated_goal=use_dilation_for_stg,
+            frontier_map=frontier_map,
+            visualize=self.visualize
+        )
         # Short term goal is in cm, start_x and start_y are in m
         if debug:
             print("Current pose:", start)
@@ -318,36 +304,6 @@ class DiscreteActionFMM:
         angle_goal = math.degrees(math.atan2(goal_x - start[0], goal_y - start[1]))
         relative_angle_to_closest_goal = pu.normalize_angle(angle_agent - angle_goal)
 
-        if debug:
-            # Actual metric distance to goal
-            distance_to_goal = np.linalg.norm(np.array([goal_x, goal_y]) - start)
-            distance_to_goal_cm = distance_to_goal * self.map_resolution
-            # Display information
-            print("-----------------")
-            print("Found reachable goal:", found_goal)
-            print("Stop:", stop)
-            print("Angle to goal:", relative_angle_to_closest_goal)
-            print("Distance to goal", distance_to_goal)
-            print(
-                "Distance in cm:",
-                distance_to_goal_cm,
-                ">",
-                self.min_goal_distance_cm,
-            )
-
-            m_relative_stg_x, m_relative_stg_y = [
-                CM_TO_METERS * self.map_resolution * d
-                for d in [relative_stg_x, relative_stg_y]
-            ]
-            print("continuous actions for exploring")
-            print("agent angle =", angle_agent)
-            print("angle stg goal =", angle_st_goal)
-            print("angle final goal =", relative_angle_to_closest_goal)
-            print(
-                m_relative_stg_x, m_relative_stg_y, "rel ang =", relative_angle_to_stg
-            )
-            print("-----------------")
-
         action = self.get_action(
             relative_stg_x,
             relative_stg_y,
@@ -358,6 +314,26 @@ class DiscreteActionFMM:
             stop,
             debug,
         )
+
+        if debug:
+            # Actual metric distance to goal
+            distance_to_goal = np.linalg.norm(np.array([goal_x, goal_y]) - start)
+            distance_to_goal_cm = distance_to_goal * self.map_resolution
+            # Display information
+            print("-----------------")
+            print("Found reachable goal:", found_goal)
+            print("Stop:", stop)
+            print("Agent Position:", start)
+            print("Goal Position:", [goal_x, goal_y])
+            print("Short-term Goal Position:", [stg_x, stg_y])
+            print("Agent Angle:", angle_agent)
+            print("Goal Position Angle:", angle_goal)
+            print("Short-term Goal Angle:", angle_st_goal)
+            print("Rel. Angle to goal:", relative_angle_to_closest_goal, "turn_angle = ", self.turn_angle)
+            print("Rel. Angle Short-term Goal =", relative_angle_to_stg, "turn_angle = ", self.turn_angle)
+            print("Distance to goal", distance_to_goal)
+            print("action =", action)
+            print("-----------------")
 
         self.last_action = action
         return action, closest_goal_map, short_term_goal, dilated_obstacles
@@ -472,6 +448,7 @@ class DiscreteActionFMM:
              the goal
             stop: binary flag to indicate we've reached the goal
         """
+        input = (obstacle_map.copy(), goal_map.copy())
         gx1, gx2, gy1, gy2 = planning_window
         (x1, y1,) = (
             0,
@@ -499,7 +476,7 @@ class DiscreteActionFMM:
             traversible,
             step_size=self.step_size,
             vis_dir=self.vis_dir,
-            visualize=self.visualize,
+            visualize=False,
             print_images=self.print_images,
             goal_tolerance=self.goal_tolerance,
         )
@@ -550,20 +527,19 @@ class DiscreteActionFMM:
         short_term_goal = int(stg_x), int(stg_y)
 
         if visualize:
-            print("Start visualizing")
-            plt.figure(1)
-            plt.subplot(131)
-            _navigable_goal_map = navigable_goal_map.copy()
-            _navigable_goal_map[int(stg_x), int(stg_y)] = 1
-            plt.imshow(np.flipud(_navigable_goal_map))
-            plt.plot(stg_x, stg_y, "bx")
-            plt.plot(start[0], start[1], "rx")
-            plt.subplot(132)
+            plt.figure(figsize=(16,8))
+            plt.subplot(151)
             plt.imshow(np.flipud(planner.fmm_dist))
-            plt.subplot(133)
+            plt.subplot(152)
             plt.imshow(np.flipud(planner.traversible))
-            plt.show()
-            print("Done visualizing.")
+            plt.subplot(153)
+            plt.imshow(np.flipud(input[0]))
+            plt.subplot(154)
+            plt.imshow(np.flipud(input[1]))
+            plt.subplot(155)
+            plt.imshow(np.flipud(frontier_map))
+            plt.savefig(self.default_vis_dir + f"/fmm_planner_{self.timestep}.png")
+            plt.close()
 
         return (
             short_term_goal,

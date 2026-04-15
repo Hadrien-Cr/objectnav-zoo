@@ -1,5 +1,6 @@
 yacs
 fvcore
+tensorboard
 cloudpickle
 pycocotools
 torch_geometric

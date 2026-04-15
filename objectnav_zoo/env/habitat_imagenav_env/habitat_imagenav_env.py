@@ -74,7 +74,7 @@ class HabitatImageNavEnv(HabitatEnv):
 
         gps = habitat_obs["gps"]
         gps[1] = -gps[1]
-        return objectnav_zoo.core.interfaces.Observations(
+        obs = objectnav_zoo.core.interfaces.Observations(
             rgb=habitat_obs["rgb"],
             depth=depth,
             compass=habitat_obs["compass"],
@@ -82,6 +82,7 @@ class HabitatImageNavEnv(HabitatEnv):
             camera_pose=camera_pose,
             task_observations=task_observations,
         )
+        return obs
 
     def _preprocess_depth(self, depth: np.ndarray) -> np.ndarray:
         rescaled_depth = self.min_depth + depth * (self.max_depth - self.min_depth)

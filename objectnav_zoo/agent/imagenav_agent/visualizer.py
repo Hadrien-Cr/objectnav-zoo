@@ -192,6 +192,7 @@ class NavVisualizer:
         sensor_pose: np.ndarray,
         found_goal: bool,
         explored_map: np.ndarray,
+        semantic_frame: np.ndarray,
         rgb_frame: np.ndarray,
         depth_frame: np.ndarray,
         timestep: int,
@@ -237,6 +238,7 @@ class NavVisualizer:
         if dilated_obstacle_map is not None:
             obstacle_map = dilated_obstacle_map
 
+        semantic_frame = np.resize(semantic_frame, rgb_frame.shape).astype(np.uint8)
         goal_frame = self.make_goal(last_goal_image)
         obs_rgb_frame = self.make_observations_rgb(
             rgb_frame,
@@ -244,17 +246,8 @@ class NavVisualizer:
             found_goal,
             metrics,
         )
-
-        max_depth_user = 5
-        depth_frame[depth_frame > max_depth_user] = max_depth_user
-        depth_frame_int8 = (
-            (max_depth_user - depth_frame) / max_depth_user * 255
-        ).astype(np.uint8)
-        obs_depth_frame = self.make_observations_depth(
-            depth_frame_int8,
-            metrics,
-        )
-
+        obs_semantic_frame = self.make_observations_sem(semantic_frame)
+        obs_depth_frame = self.make_observations_depth(depth_frame)
         map_pred_frame = self.make_map_preds(
             sensor_pose,
             obstacle_map,
@@ -271,12 +264,12 @@ class NavVisualizer:
 
         if td_map_frame is None:
             frame = np.concatenate(
-                [goal_frame, obs_rgb_frame, obs_depth_frame, map_pred_frame, kp_frame],
+                [goal_frame, obs_rgb_frame, obs_semantic_frame, obs_depth_frame, map_pred_frame, kp_frame],
                 axis=1,
             )
         else:
             upper_frame = np.concatenate(
-                [goal_frame, obs_rgb_frame, obs_depth_frame, kp_frame], axis=1
+                [goal_frame, obs_rgb_frame, obs_semantic_frame, obs_depth_frame, kp_frame], axis=1
             )
             lower_frame = self.pad_frame(
                 np.concatenate([map_pred_frame, td_map_frame], axis=1),
@@ -375,9 +368,47 @@ class NavVisualizer:
         )
         return frame
 
-    def make_observations_rgb(
+    def make_observations_sem(
         self,
         sem_img: np.ndarray,
+    ) -> np.ndarray:
+        border_size = 10
+        text_bar_height = 50 - border_size
+        new_h = self.ind_frame_height - text_bar_height - 2 * border_size
+        new_w = int(new_h / sem_img.shape[0] * sem_img.shape[1])
+        sem_img = cv2.resize(sem_img, (new_w, new_h))
+
+        sem_img = cv2.cvtColor(sem_img, cv2.COLOR_RGB2BGR)
+        sem_img = self._add_border(sem_img, border_size)
+        w = sem_img.shape[1]
+
+        top_bar = np.ones((text_bar_height, w, 3), dtype=np.uint8) * 255
+        frame = np.concatenate([top_bar, sem_img.astype(np.uint8)], axis=0)
+
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        fontScale = 0.8
+        color = (20, 20, 20)
+        thickness = 2
+
+        text = "Semantic"
+        textsize = cv2.getTextSize(text, font, fontScale, thickness)[0]
+        textX = (w - textsize[0]) // 2
+        textY = (text_bar_height + border_size + textsize[1]) // 2
+        frame = cv2.putText(
+            frame,
+            text,
+            (textX, textY),
+            font,
+            fontScale,
+            color,
+            thickness,
+            cv2.LINE_AA,
+        )
+        return frame
+
+    def make_observations_rgb(
+        self,
+        rgb_img: np.ndarray,
         collision: bool,
         found_goal: bool,
         metrics: Dict[str, float],
@@ -389,23 +420,23 @@ class NavVisualizer:
         border_size = 10
         text_bar_height = 50 - border_size
         new_h = self.ind_frame_height - text_bar_height - 2 * border_size
-        new_w = int(new_h / sem_img.shape[0] * sem_img.shape[1])
-        sem_img = cv2.resize(sem_img, (new_w, new_h))
+        new_w = int(new_h / rgb_img.shape[0] * rgb_img.shape[1])
+        rgb_img = cv2.resize(rgb_img, (new_w, new_h))
 
         if found_goal:
-            sem_img = self._found_goal_detection(sem_img)
+            rgb_img = self._found_goal_detection(rgb_img)
 
-        sem_img = self._write_metrics(sem_img, metrics)
+        rgb_img = self._write_metrics(rgb_img, metrics)
 
         if collision:
-            sem_img = draw_collision(sem_img)
+            rgb_img = draw_collision(rgb_img)
 
-        sem_img = cv2.cvtColor(sem_img, cv2.COLOR_RGB2BGR)
-        sem_img = self._add_border(sem_img, border_size)
-        w = sem_img.shape[1]
+        rgb_img = cv2.cvtColor(rgb_img, cv2.COLOR_RGB2BGR)
+        rgb_img = self._add_border(rgb_img, border_size)
+        w = rgb_img.shape[1]
 
         top_bar = np.ones((text_bar_height, w, 3), dtype=np.uint8) * 255
-        frame = np.concatenate([top_bar, sem_img.astype(np.uint8)], axis=0)
+        frame = np.concatenate([top_bar, rgb_img.astype(np.uint8)], axis=0)
 
         font = cv2.FONT_HERSHEY_SIMPLEX
         fontScale = 0.8
@@ -430,25 +461,29 @@ class NavVisualizer:
 
     def make_observations_depth(
         self,
-        sem_img: np.ndarray,
-        metrics: Dict[str, float],
+        depth_img: np.ndarray,
     ) -> np.ndarray:
         """
         make the egocentric depth observation sub-frame.
         """
+        max_depth_user = 5
+        depth_img[depth_img > max_depth_user] = max_depth_user
+        depth_img = (
+            (max_depth_user - depth_img) / max_depth_user * 255
+        ).astype(np.uint8)
+
         border_size = 10
         text_bar_height = 50 - border_size
         new_h = self.ind_frame_height - text_bar_height - 2 * border_size
-        new_w = int(new_h / sem_img.shape[0] * sem_img.shape[1])
-        sem_img = cv2.resize(sem_img, (new_w, new_h))
-        sem_img = self._write_metrics(sem_img, metrics)
+        new_w = int(new_h / depth_img.shape[0] * depth_img.shape[1])
+        depth_img = cv2.resize(depth_img, (new_w, new_h))
 
-        sem_img = cv2.cvtColor(sem_img, cv2.COLOR_RGB2BGR)
-        sem_img = self._add_border(sem_img, border_size)
-        w = sem_img.shape[1]
+        depth_img = cv2.cvtColor(depth_img, cv2.COLOR_RGB2BGR)
+        depth_img = self._add_border(depth_img, border_size)
+        w = depth_img.shape[1]
 
         top_bar = np.ones((text_bar_height, w, 3), dtype=np.uint8) * 255
-        frame = np.concatenate([top_bar, sem_img.astype(np.uint8)], axis=0)
+        frame = np.concatenate([top_bar, depth_img.astype(np.uint8)], axis=0)
 
         font = cv2.FONT_HERSHEY_SIMPLEX
         fontScale = 0.8
@@ -561,7 +596,7 @@ class NavVisualizer:
             np.deg2rad(-curr_o),
         )
         pos = (pos[0] * new_w / old_w, pos[1] * new_h / old_h, pos[2])
-        agent_arrow = get_contour_points(pos, origin=(0, 0))
+        agent_arrow = get_contour_points(pos, origin=(0, 0), size = 10)
         color = MAP_COLOR_PALETTE[9:12][::-1]
         cv2.drawContours(semantic_map_vis, [agent_arrow], 0, color, -1)
 

@@ -430,6 +430,11 @@ class LanguageNavCategories(SemanticCategoryMapping):
 
     def __init__(self):
         self.goal_id_to_goal_name = languagenav_2categories_indexes
+
+        self.goal_name_to_goal_id = {}
+        for gid, gname in self.goal_id_to_goal_name.items():
+            self.goal_name_to_goal_id[gname] = gid
+            
         self._instance_id_to_category_id = None
         super().__init__(self.goal_id_to_goal_name)
 

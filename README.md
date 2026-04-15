@@ -10,9 +10,8 @@ See [INSTALL.md](INSTALL.md)
 - [ ] Cross-Dataset Evaluation 
 - [ ] Automatic Tuning 
 - [x] Integrate [Mod-IIN](https://github.com/facebookresearch/home-robot/tree/main/projects/mod_IIN)
-- [ ] Integrate [SemExp](https://github.com/devendrachaplot/Object-Goal-Navigation)
-- [ ] Integrate [3DAwareNav](https://github.com/jzhzhang/3DAwareNav)
-- [ ] Integrate [Modular GOAT - Modular CoW](https://theophilegervet.github.io/projects/goat/)
+- [ ] Integrate [Modular CoW](https://theophilegervet.github.io/projects/goat/)
+- [ ] Integrate [Modular GOAT](https://theophilegervet.github.io/projects/goat/)
 - [ ] Integrate [Concept Graphs](https://concept-graphs.github.io/)
 - [ ] Integrate [MTU3D](https://github.com/MTU3D/MTU3D)
 - [ ] Integrate [3DMem](https://github.com/UMass-Embodied-AGI/3D-Mem)

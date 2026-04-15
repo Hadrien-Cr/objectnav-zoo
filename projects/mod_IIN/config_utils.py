@@ -62,8 +62,7 @@ def get_config(path: str, opts: Optional[list] = None) -> Tuple[DictConfig, str]
         config.habitat.simulator.agents.main_agent.sim_sensors.depth_sensor.hfov = (
             cam_hfov
         )
-
-        if config.generate_videos:
+        if config.verbose:
             config.habitat.task.measurements.update(
                 {
                     "top_down_map": TopDownMapMeasurementConfig(
